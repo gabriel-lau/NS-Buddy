@@ -22,14 +22,14 @@ void main() {
     settings.setDob(testDob);
     settings.setGender('male');
     settings.setIsShiongVoc(true);
-    settings.setHasORD(true);
+    settings.setIsNSF(false);
     settings.setOrdDate(testOrdDate);
 
     // Verify that the values were set correctly
     expect(settings.dob, equals(testDob));
     expect(settings.gender, equals('male'));
     expect(settings.isShiongVoc, isTrue);
-    expect(settings.hasORD, isTrue);
+    expect(settings.isNSF, isFalse);
     expect(settings.ordDate, equals(testOrdDate));
   });
 
@@ -41,14 +41,14 @@ void main() {
     settings.setDob(null);
     settings.setGender(null);
     settings.setIsShiongVoc(false);
-    settings.setHasORD(false);
+    settings.setIsNSF(true);
     settings.setOrdDate(null);
 
     // Verify that null values are handled correctly
     expect(settings.dob, isNull);
     expect(settings.gender, isNull);
     expect(settings.isShiongVoc, isFalse);
-    expect(settings.hasORD, isFalse);
+    expect(settings.isNSF, isTrue);
     expect(settings.ordDate, isNull);
   });
 
@@ -79,7 +79,7 @@ void main() {
     expect(settings.dob, isNull);
     expect(settings.gender, isNull);
     expect(settings.isShiongVoc, isFalse);
-    expect(settings.hasORD, isFalse);
+    expect(settings.isNSF, isFalse);
     expect(settings.ordDate, isNull);
   });
 }

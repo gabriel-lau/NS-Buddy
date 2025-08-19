@@ -61,8 +61,8 @@ class AppController {
     settings.setIsShiongVoc(value);
   }
 
-  void setHasORD(bool value) {
-    settings.setHasORD(value);
+  void setIsNSF(bool value) {
+    settings.setIsNSF(value);
   }
 
   void setOrdDate(DateTime? value) {

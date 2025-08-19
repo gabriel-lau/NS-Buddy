@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/app_controller.dart';
 import '../controllers/counter_controller.dart';
+import '../models/app_settings.dart';
 import 'settings_view.dart';
 
 class HomeView extends StatelessWidget {
@@ -26,7 +27,7 @@ class HomeView extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.surface,
               foregroundColor: Theme.of(context).colorScheme.onSurface,
               elevation: 0,
-              title: const Text('Flutter Demo Home Page'),
+              title: const Text('NS Buddy'),
               centerTitle: true,
               actions: [
                 IconButton(
@@ -51,7 +52,7 @@ class HomeView extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
-                _IPPTTab(),
+                _IPPTTab(settings: settings),
                 _CounterTab(counterController: counterController),
               ],
             ),
@@ -63,7 +64,9 @@ class HomeView extends StatelessWidget {
 }
 
 class _IPPTTab extends StatefulWidget {
-  const _IPPTTab();
+  final AppSettings settings;
+
+  const _IPPTTab({required this.settings});
 
   @override
   State<_IPPTTab> createState() => _IPPTTabState();
@@ -74,133 +77,431 @@ class _IPPTTabState extends State<_IPPTTab> {
   double _sitUpValue = 0;
   double _runValue = 8;
 
+  // Local, non-persisted age state
+  late int _age = 16;
+  final List<int> _ageOptions = List<int>.generate(45, (i) => 16 + i); // 16..60
+
+  // Local, non-persisted gender state (derived from settings.gender initially)
+  late String _genderLocal = 'male';
+
+  // Local, non-persisted Shiong vocation
+  late bool _isShiongVocLocal = false;
+
+  // Score calculations
+  double get _pushUpScore => (_pushUpValue / 60.0) * 40.0;
+  double get _sitUpScore => (_sitUpValue / 60.0) * 40.0;
+  double get _runScore {
+    // Lower time is better: 8min -> best, 20min -> worst
+    final normalized = (20.0 - _runValue) / (20.0 - 8.0);
+    return (normalized.clamp(0.0, 1.0)) * 20.0;
+  }
+
+  double get _score =>
+      (_pushUpScore + _sitUpScore + _runScore).clamp(0.0, 100.0);
+  int get _scoreInt => _score.round();
+  String get _award {
+    if (_score < 50) return 'fail';
+    if (_score < 70) return 'pass';
+    if (_score < 85) return 'silver';
+    return 'gold';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _age = _deriveAgeFromDob(widget.settings.dob) ?? 16;
+    _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
+    _isShiongVocLocal = widget.settings.isShiongVoc;
+  }
+
+  int? _deriveAgeFromDob(DateTime? dob) {
+    if (dob == null) return null;
+    final now = DateTime.now();
+    int years = now.year - dob.year;
+    final hadBirthdayThisYear =
+        (now.month > dob.month) ||
+        (now.month == dob.month && now.day >= dob.day);
+    if (!hadBirthdayThisYear) years -= 1;
+    return years.clamp(0, 120);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Collapsible card at the top
-                    Card(
-                      child: ExpansionTile(
-                        title: Row(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'IPPT Information',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ],
-                        ),
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Text(
-                              'Information content will be added here.',
-                              style: TextStyle(fontStyle: FontStyle.italic),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // IPPT Score Calculator Card
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // Collapsible card at the top
+                        Card(
+                          child: ExpansionTile(
+                            title: Row(
                               children: [
                                 Icon(
-                                  Icons.calculate,
+                                  Icons.edit,
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'IPPT Score Calculator',
+                                  'Parameters',
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
-                            // Push-up Slider
-                            Text(
-                              'Push-ups: ${_pushUpValue.toInt()}',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Slider(
-                              value: _pushUpValue,
-                              min: 0,
-                              max: 60,
-                              divisions: 60,
-                              label: _pushUpValue.toInt().toString(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _pushUpValue = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // Sit-up Slider
-                            Text(
-                              'Sit-ups: ${_sitUpValue.toInt()}',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Slider(
-                              value: _sitUpValue,
-                              min: 0,
-                              max: 60,
-                              divisions: 60,
-                              label: _sitUpValue.toInt().toString(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _sitUpValue = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            // 2.4km Run Slider
-                            Text(
-                              '2.4km Run: ${_runValue.toInt()} minutes',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Slider(
-                              value: _runValue,
-                              min: 8,
-                              max: 20,
-                              divisions: 120,
-                              label: '${_runValue.toStringAsFixed(1)} min',
-                              onChanged: (value) {
-                                setState(() {
-                                  _runValue = value;
-                                });
-                              },
-                            ),
-                          ],
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  16,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Age',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge,
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.remove_circle_outline,
+                                      ),
+                                      tooltip: 'Decrease age',
+                                      onPressed: () {
+                                        setState(() {
+                                          final minAge = _ageOptions.first;
+                                          _age = (_age - 1).clamp(
+                                            minAge,
+                                            _ageOptions.last,
+                                          );
+                                        });
+                                      },
+                                    ),
+                                    const SizedBox(width: 4),
+                                    DropdownButton<int>(
+                                      value: _age,
+                                      items: _ageOptions
+                                          .map(
+                                            (a) => DropdownMenuItem<int>(
+                                              value: a,
+                                              child: Text('$a'),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (val) {
+                                        if (val == null) return;
+                                        setState(() {
+                                          _age = val;
+                                        });
+                                      },
+                                    ),
+                                    const SizedBox(width: 4),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.add_circle_outline,
+                                      ),
+                                      tooltip: 'Increase age',
+                                      onPressed: () {
+                                        setState(() {
+                                          final maxAge = _ageOptions.last;
+                                          _age = (_age + 1).clamp(
+                                            _ageOptions.first,
+                                            maxAge,
+                                          );
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Gender selector (local only)
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Gender',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge,
+                                    ),
+                                    const Spacer(),
+                                    ToggleButtons(
+                                      isSelected: [
+                                        _genderLocal == 'male',
+                                        _genderLocal == 'female',
+                                      ],
+                                      onPressed: (index) {
+                                        setState(() {
+                                          _genderLocal = index == 0
+                                              ? 'male'
+                                              : 'female';
+                                        });
+                                      },
+                                      borderRadius: BorderRadius.circular(8),
+                                      children: const [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          child: Text('Male'),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          child: Text('Female'),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Shiong vocation switch (local only)
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Commando, NDU or Guards?',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyLarge,
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: _isShiongVocLocal,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _isShiongVocLocal = val;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  'Information content will be added here.',
+                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(height: 16),
+                        // IPPT Score Calculator Card
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calculate,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'IPPT Score Calculator',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
+                                // Push-up Slider
+                                Text(
+                                  'Push-ups: ${_pushUpValue.toInt()}',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                Slider(
+                                  value: _pushUpValue,
+                                  min: 0,
+                                  max: 60,
+                                  divisions: 60,
+                                  label: _pushUpValue.toInt().toString(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _pushUpValue = value;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                // Sit-up Slider
+                                Text(
+                                  'Sit-ups: ${_sitUpValue.toInt()}',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                Slider(
+                                  value: _sitUpValue,
+                                  min: 0,
+                                  max: 60,
+                                  divisions: 60,
+                                  label: _sitUpValue.toInt().toString(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _sitUpValue = value;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                // 2.4km Run Slider
+                                Text(
+                                  '2.4km Run: ${_runValue.toInt()} minutes',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                Slider(
+                                  value: _runValue,
+                                  min: 8,
+                                  max: 20,
+                                  divisions: 120,
+                                  label: '${_runValue.toStringAsFixed(1)} min',
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _runValue = value;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 120,
+                                ), // Spacer so bottom bar does not overlap content
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: _buildScoreBar(context),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildScoreBar(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    return SafeArea(
+      top: false,
+      child: Material(
+        elevation: 6,
+        color: scheme.surface,
+        shadowColor: Colors.black26,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: scheme.outlineVariant)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              // Progress takes the most space
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'IPPT Score',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: _score / 100.0,
+                        minHeight: 8,
+                        backgroundColor: scheme.surfaceContainerHighest,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          );
-        },
+              const SizedBox(width: 16),
+              // Score value
+              Text(
+                '$_scoreInt/100',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(width: 12),
+              // Award chip
+              _buildAwardChip(context),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildAwardChip(BuildContext context) {
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+    Color background;
+    Color foreground = scheme.onPrimary;
+
+    switch (_award) {
+      case 'gold':
+        background = Colors.amber.shade600;
+        break;
+      case 'silver':
+        background = Colors.blueGrey.shade300;
+        foreground = Colors.black87;
+        break;
+      case 'pass':
+        background = Colors.green.shade600;
+        break;
+      default:
+        background = scheme.error;
+        foreground = scheme.onError;
+        break;
+    }
+
+    return Chip(
+      label: Text(_award.toUpperCase()),
+      backgroundColor: background,
+      labelStyle: Theme.of(
+        context,
+      ).textTheme.labelLarge?.copyWith(color: foreground),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      visualDensity: VisualDensity.compact,
     );
   }
 }
@@ -256,9 +557,15 @@ class _CounterTab extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Use the floating action button to increment the counter. The value is persisted using shared_preferences.',
+                                'Use the button below to increment the counter. The value is persisted using shared_preferences.',
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: counterController.increment,
+                                icon: const Icon(Icons.add),
+                                label: const Text('Increment'),
                               ),
                             ],
                           ),
@@ -271,11 +578,6 @@ class _CounterTab extends StatelessWidget {
             );
           },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: counterController.increment,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

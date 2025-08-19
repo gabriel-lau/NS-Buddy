@@ -9,7 +9,7 @@ class AppSettings with ChangeNotifier {
   DateTime? _dob;
   String? _gender;
   bool _isShiongVoc = false;
-  bool _hasORD = false;
+  bool _isNSF = false;
   DateTime? _ordDate;
 
   // Flag to disable persistence for testing
@@ -30,7 +30,7 @@ class AppSettings with ChangeNotifier {
   DateTime? get dob => _dob;
   String? get gender => _gender;
   bool get isShiongVoc => _isShiongVoc;
-  bool get hasORD => _hasORD;
+  bool get isNSF => _isNSF;
   DateTime? get ordDate => _ordDate;
 
   // Initialize settings from shared preferences
@@ -51,7 +51,7 @@ class AppSettings with ChangeNotifier {
 
       _gender = prefs.getString('gender');
       _isShiongVoc = prefs.getBool('isShiongVoc') ?? false;
-      _hasORD = prefs.getBool('hasORD') ?? false;
+      _isNSF = prefs.getBool('isNSF') ?? false;
 
       final ordDateString = prefs.getString('ordDate');
       if (ordDateString != null) {
@@ -89,7 +89,7 @@ class AppSettings with ChangeNotifier {
       }
 
       await prefs.setBool('isShiongVoc', _isShiongVoc);
-      await prefs.setBool('hasORD', _hasORD);
+      await prefs.setBool('isNSF', _isNSF);
 
       if (_ordDate != null) {
         await prefs.setString('ordDate', _ordDate!.toIso8601String());
@@ -138,9 +138,9 @@ class AppSettings with ChangeNotifier {
     notifyListeners();
   }
 
-  void setHasORD(bool value) {
-    if (_hasORD == value) return;
-    _hasORD = value;
+  void setIsNSF(bool value) {
+    if (_isNSF == value) return;
+    _isNSF = value;
     saveSettings();
     notifyListeners();
   }

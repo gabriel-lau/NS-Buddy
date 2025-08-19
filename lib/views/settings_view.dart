@@ -94,16 +94,18 @@ class SettingsView extends StatelessWidget {
                                 onChanged: appController.setIsShiongVoc,
                               ),
 
-                              // Has ORD
+                              // Is NSF
                               SwitchListTile(
-                                title: const Text('Has ORD'),
-                                subtitle: const Text('Have you ORDed?'),
-                                value: settings.hasORD,
-                                onChanged: appController.setHasORD,
+                                title: const Text('NSF'),
+                                subtitle: const Text(
+                                  'Are you currently serving NS?',
+                                ),
+                                value: settings.isNSF,
+                                onChanged: appController.setIsNSF,
                               ),
 
-                              // ORD Date (only show if has ORD is false)
-                              if (!settings.hasORD)
+                              // ORD Date (only show if)
+                              if (settings.isNSF)
                                 ListTile(
                                   title: const Text('ORD Date'),
                                   subtitle: Text(
