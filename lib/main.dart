@@ -21,6 +21,7 @@ class _MyAppState extends State<MyApp> {
   late final AppController _appController;
   late final Counter _counter;
   late final CounterController _counterController;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -29,12 +30,30 @@ class _MyAppState extends State<MyApp> {
     _appController = AppController(settings: _settings);
     _counter = Counter();
     _counterController = CounterController(counter: _counter);
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
     // Load persisted counter value
-    _counter.load();
+    await _counter.load();
+    // Load persisted settings
+    await _appController.initializeSettings();
+
+    if (mounted) {
+      setState(() {
+        _isInitialized = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return MaterialApp(
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
+
     return AnimatedBuilder(
       animation: _settings,
       builder: (context, _) {

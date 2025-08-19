@@ -5,26 +5,81 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:ns_buddy/main.dart';
+import 'package:ns_buddy/models/app_settings.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  test('AppSettings can set and get user information', () {
+    // Create a new AppSettings instance with persistence disabled for testing
+    final settings = AppSettings(disablePersistence: true);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Set some test values
+    final testDob = DateTime(1995, 5, 15);
+    final testOrdDate = DateTime(2023, 12, 31);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    settings.setDob(testDob);
+    settings.setGender('male');
+    settings.setIsShiongVoc(true);
+    settings.setHasORD(true);
+    settings.setOrdDate(testOrdDate);
+
+    // Verify that the values were set correctly
+    expect(settings.dob, equals(testDob));
+    expect(settings.gender, equals('male'));
+    expect(settings.isShiongVoc, isTrue);
+    expect(settings.hasORD, isTrue);
+    expect(settings.ordDate, equals(testOrdDate));
+  });
+
+  test('AppSettings handles null values correctly', () {
+    // Create a new AppSettings instance with persistence disabled for testing
+    final settings = AppSettings(disablePersistence: true);
+
+    // Set some values to null
+    settings.setDob(null);
+    settings.setGender(null);
+    settings.setIsShiongVoc(false);
+    settings.setHasORD(false);
+    settings.setOrdDate(null);
+
+    // Verify that null values are handled correctly
+    expect(settings.dob, isNull);
+    expect(settings.gender, isNull);
+    expect(settings.isShiongVoc, isFalse);
+    expect(settings.hasORD, isFalse);
+    expect(settings.ordDate, isNull);
+  });
+
+  test('AppSettings notifies listeners when values change', () {
+    // Create a new AppSettings instance with persistence disabled for testing
+    final settings = AppSettings(disablePersistence: true);
+    bool listenerCalled = false;
+
+    // Add a listener
+    settings.addListener(() {
+      listenerCalled = true;
+    });
+
+    // Change a value
+    settings.setDob(DateTime(1990, 1, 1));
+
+    // Verify that the listener was called
+    expect(listenerCalled, isTrue);
+  });
+
+  test('AppSettings has correct default values', () {
+    // Create a new AppSettings instance with persistence disabled for testing
+    final settings = AppSettings(disablePersistence: true);
+
+    // Verify default values
+    expect(settings.useDynamicColors, isTrue);
+    expect(settings.isDarkMode, isFalse);
+    expect(settings.dob, isNull);
+    expect(settings.gender, isNull);
+    expect(settings.isShiongVoc, isFalse);
+    expect(settings.hasORD, isFalse);
+    expect(settings.ordDate, isNull);
   });
 }

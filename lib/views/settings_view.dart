@@ -28,26 +28,130 @@ class SettingsView extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
+                      // User Information Section
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.person,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'User Information',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Date of Birth
+                              ListTile(
+                                title: const Text('Date of Birth'),
+                                subtitle: Text(
+                                  settings.dob != null
+                                      ? '${settings.dob!.day}/${settings.dob!.month}/${settings.dob!.year}'
+                                      : 'Not set',
+                                ),
+                                trailing: const Icon(Icons.calendar_today),
+                                onTap: () =>
+                                    _selectDate(context, settings.dob, (date) {
+                                      appController.setDob(date);
+                                    }),
+                              ),
+
+                              // Gender
+                              ListTile(
+                                title: const Text('Gender'),
+                                subtitle: Text(settings.gender ?? 'Not set'),
+                                trailing: const Icon(Icons.arrow_forward_ios),
+                                onTap: () => _selectGender(
+                                  context,
+                                  settings.gender,
+                                  (gender) {
+                                    appController.setGender(gender);
+                                  },
+                                ),
+                              ),
+
+                              // Is Shiong Voc
+                              SwitchListTile(
+                                title: const Text('Shiong vocation'),
+                                subtitle: const Text(
+                                  'Are you in Commando, NDU or Guards?',
+                                ),
+                                value: settings.isShiongVoc,
+                                onChanged: appController.setIsShiongVoc,
+                              ),
+
+                              // Has ORD
+                              SwitchListTile(
+                                title: const Text('Has ORD'),
+                                subtitle: const Text('Have you ORDed?'),
+                                value: settings.hasORD,
+                                onChanged: appController.setHasORD,
+                              ),
+
+                              // ORD Date (only show if has ORD is false)
+                              if (!settings.hasORD)
+                                ListTile(
+                                  title: const Text('ORD Date'),
+                                  subtitle: Text(
+                                    settings.ordDate != null
+                                        ? '${settings.ordDate!.day}/${settings.ordDate!.month}/${settings.ordDate!.year}'
+                                        : 'Not set',
+                                  ),
+                                  trailing: const Icon(Icons.calendar_today),
+                                  onTap: () => _selectDate(
+                                    context,
+                                    settings.ordDate,
+                                    (date) {
+                                      appController.setOrdDate(date);
+                                    },
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // App Settings Section
                       Card(
                         margin: const EdgeInsets.only(bottom: 16),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             children: [
-                              Icon(
-                                Icons.auto_awesome,
-                                size: 48,
-                                color: Theme.of(context).colorScheme.primary,
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.auto_awesome,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'App Settings',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 16),
                               Text(
                                 'Material 3 with Dynamic Colors',
-                                style: Theme.of(context).textTheme.titleMedium,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'This app now supports Material 3 design and dynamic colors on supported platforms.',
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 textAlign: TextAlign.center,
                               ),
@@ -82,6 +186,8 @@ class SettingsView extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      // Color Scheme Preview
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -150,5 +256,67 @@ class SettingsView extends StatelessWidget {
         Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],
     );
+  }
+
+  Future<void> _selectDate(
+    BuildContext context,
+    DateTime? initialDate,
+    Function(DateTime?) onDateSelected,
+  ) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != initialDate) {
+      onDateSelected(picked);
+    }
+  }
+
+  Future<void> _selectGender(
+    BuildContext context,
+    String? currentGender,
+    Function(String?) onGenderSelected,
+  ) async {
+    final String? selectedGender = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Gender'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Male'),
+                leading: Radio<String>(
+                  value: 'male',
+                  groupValue: currentGender,
+                  onChanged: (value) => Navigator.of(context).pop(value),
+                ),
+              ),
+              ListTile(
+                title: const Text('Female'),
+                leading: Radio<String>(
+                  value: 'female',
+                  groupValue: currentGender,
+                  onChanged: (value) => Navigator.of(context).pop(value),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedGender != null) {
+      onGenderSelected(selectedGender);
+    }
   }
 }

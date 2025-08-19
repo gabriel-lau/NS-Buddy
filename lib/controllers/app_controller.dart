@@ -6,6 +6,11 @@ class AppController {
 
   AppController({required this.settings});
 
+  // Initialize settings from shared preferences
+  Future<void> initializeSettings() async {
+    await settings.loadSettings();
+  }
+
   ThemeMode get themeMode =>
       settings.isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
@@ -41,5 +46,26 @@ class AppController {
 
   void setDynamicColors(bool value) {
     settings.setUseDynamicColors(value);
+  }
+
+  // User information methods
+  void setDob(DateTime? value) {
+    settings.setDob(value);
+  }
+
+  void setGender(String? value) {
+    settings.setGender(value);
+  }
+
+  void setIsShiongVoc(bool value) {
+    settings.setIsShiongVoc(value);
+  }
+
+  void setHasORD(bool value) {
+    settings.setHasORD(value);
+  }
+
+  void setOrdDate(DateTime? value) {
+    settings.setOrdDate(value);
   }
 }
