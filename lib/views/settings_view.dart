@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart' show Jiffy;
 import '../controllers/app_controller.dart';
 
 class SettingsView extends StatelessWidget {
@@ -64,25 +65,30 @@ class SettingsView extends StatelessWidget {
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
-                                onTap: () =>
-                                    _selectDate(context, settings.dob, (date) {
-                                      appController.setDob(date);
-                                    }),
-                              ),
-
-                              // Gender
-                              ListTile(
-                                title: const Text('Gender'),
-                                subtitle: Text(settings.gender ?? 'Not set'),
-                                trailing: const Icon(Icons.arrow_forward_ios),
-                                onTap: () => _selectGender(
+                                onTap: () => _selectDate(
                                   context,
-                                  settings.gender,
-                                  (gender) {
-                                    appController.setGender(gender);
+                                  settings.dob,
+                                  DateTime(1900),
+                                  Jiffy.now().subtract(years: 16).dateTime,
+                                  (date) {
+                                    appController.setDob(date);
                                   },
                                 ),
                               ),
+
+                              // Gender (temporarily disabled)
+                              // ListTile(
+                              //   title: const Text('Gender'),
+                              //   subtitle: Text(settings.gender ?? 'Not set'),
+                              //   trailing: const Icon(Icons.arrow_forward_ios),
+                              //   onTap: () => _selectGender(
+                              //     context,
+                              //     settings.gender,
+                              //     (gender) {
+                              //       appController.setGender(gender);
+                              //     },
+                              //   ),
+                              // ),
 
                               // Is Shiong Voc
                               SwitchListTile(
@@ -104,6 +110,27 @@ class SettingsView extends StatelessWidget {
                                 onChanged: appController.setIsNSF,
                               ),
 
+                              // Enlistment Date (only show if NSF)
+                              if (settings.isNSF)
+                                ListTile(
+                                  title: const Text('Enlistment Date'),
+                                  subtitle: Text(
+                                    settings.enlistmentDate != null
+                                        ? '${settings.enlistmentDate!.day}/${settings.enlistmentDate!.month}/${settings.enlistmentDate!.year}'
+                                        : 'Not set',
+                                  ),
+                                  trailing: const Icon(Icons.calendar_today),
+                                  onTap: () => _selectDate(
+                                    context,
+                                    settings.enlistmentDate,
+                                    DateTime(1900),
+                                    Jiffy.now().add(years: 5).dateTime,
+                                    (date) {
+                                      appController.setEnlistmentDate(date);
+                                    },
+                                  ),
+                                ),
+
                               // ORD Date (only show if)
                               if (settings.isNSF)
                                 ListTile(
@@ -117,6 +144,8 @@ class SettingsView extends StatelessWidget {
                                   onTap: () => _selectDate(
                                     context,
                                     settings.ordDate,
+                                    DateTime(1900),
+                                    Jiffy.now().add(years: 5).dateTime,
                                     (date) {
                                       appController.setOrdDate(date);
                                     },
@@ -263,62 +292,20 @@ class SettingsView extends StatelessWidget {
   Future<void> _selectDate(
     BuildContext context,
     DateTime? initialDate,
+    DateTime firstDate,
+    DateTime lastDate,
     Function(DateTime?) onDateSelected,
   ) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate ?? DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now().add(Duration(days: 365 * 5)),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
     if (picked != null && picked != initialDate) {
       onDateSelected(picked);
     }
   }
 
-  Future<void> _selectGender(
-    BuildContext context,
-    String? currentGender,
-    Function(String?) onGenderSelected,
-  ) async {
-    final String? selectedGender = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Gender'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('Male'),
-                leading: Radio<String>(
-                  value: 'male',
-                  groupValue: currentGender,
-                  onChanged: (value) => Navigator.of(context).pop(value),
-                ),
-              ),
-              ListTile(
-                title: const Text('Female'),
-                leading: Radio<String>(
-                  value: 'female',
-                  groupValue: currentGender,
-                  onChanged: (value) => Navigator.of(context).pop(value),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (selectedGender != null) {
-      onGenderSelected(selectedGender);
-    }
-  }
+  // Gender selection temporarily disabled for future versions
 }

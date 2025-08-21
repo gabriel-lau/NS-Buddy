@@ -75,8 +75,8 @@ class _IPPTTabState extends State<_IPPTTab> {
   late int _age = 16;
   final List<int> _ageOptions = List<int>.generate(45, (i) => 16 + i); // 16..60
 
-  // Local, non-persisted gender state (derived from settings.gender initially)
-  late String _genderLocal = 'male';
+  // Local, non-persisted gender state (disabled for now)
+  // late String _genderLocal = 'male';
 
   // Local, non-persisted Shiong vocation
   late bool _isShiongVocLocal = false;
@@ -112,7 +112,7 @@ class _IPPTTabState extends State<_IPPTTab> {
   void _resetParameters() {
     setState(() {
       _age = _deriveAgeFromDob(widget.settings.dob) ?? 16;
-      _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
+      // _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
       _isShiongVocLocal = widget.settings.isShiongVoc;
       _isEdited = false;
     });
@@ -234,57 +234,39 @@ class _IPPTTabState extends State<_IPPTTab> {
                                   ],
                                 ),
                               ),
-                              // Gender selector (local only)
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  0,
-                                  16,
-                                  12,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Gender',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyLarge,
-                                    ),
-                                    const Spacer(),
-                                    ToggleButtons(
-                                      isSelected: [
-                                        _genderLocal == 'male',
-                                        _genderLocal == 'female',
-                                      ],
-                                      onPressed: (index) {
-                                        setState(() {
-                                          _genderLocal = index == 0
-                                              ? 'male'
-                                              : 'female';
-                                          _isEdited = true;
-                                        });
-                                      },
-                                      borderRadius: BorderRadius.circular(8),
-                                      children: const [
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
-                                          ),
-                                          child: Text('Male'),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 8,
-                                          ),
-                                          child: Text('Female'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              // Gender selector (disabled for now)
+                              // Padding(
+                              //   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                              //   child: Row(
+                              //     children: [
+                              //       Text('Gender', style: Theme.of(context).textTheme.bodyLarge),
+                              //       const Spacer(),
+                              //       ToggleButtons(
+                              //         isSelected: [
+                              //           _genderLocal == 'male',
+                              //           _genderLocal == 'female',
+                              //         ],
+                              //         onPressed: (index) {
+                              //           setState(() {
+                              //             _genderLocal = index == 0 ? 'male' : 'female';
+                              //             _isEdited = true;
+                              //           });
+                              //         },
+                              //         borderRadius: BorderRadius.circular(8),
+                              //         children: const [
+                              //           Padding(
+                              //             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              //             child: Text('Male'),
+                              //           ),
+                              //           Padding(
+                              //             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              //             child: Text('Female'),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                               // Shiong vocation switch (local only)
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(

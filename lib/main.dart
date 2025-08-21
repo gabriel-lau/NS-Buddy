@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'controllers/app_controller.dart';
 import 'models/app_settings.dart';
 import 'views/home_view.dart';
+import 'views/onboarding_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,7 +55,9 @@ class _MyAppState extends State<MyApp> {
           theme: _appController.buildLightTheme(),
           darkTheme: _appController.buildDarkTheme(),
           themeMode: _appController.themeMode,
-          home: HomeView(appController: _appController),
+          home: _settings.hasCompletedOnboarding
+              ? HomeView(appController: _appController)
+              : OnboardingView(appController: _appController),
         );
       },
     );

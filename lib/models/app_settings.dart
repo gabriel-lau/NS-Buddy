@@ -11,6 +11,8 @@ class AppSettings with ChangeNotifier {
   bool _isShiongVoc = false;
   bool _isNSF = false;
   DateTime? _ordDate;
+  DateTime? _enlistmentDate;
+  bool _hasCompletedOnboarding = false;
 
   // Flag to disable persistence for testing
   final bool _disablePersistence;
@@ -32,6 +34,8 @@ class AppSettings with ChangeNotifier {
   bool get isShiongVoc => _isShiongVoc;
   bool get isNSF => _isNSF;
   DateTime? get ordDate => _ordDate;
+  DateTime? get enlistmentDate => _enlistmentDate;
+  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
 
   // Initialize settings from shared preferences
   Future<void> loadSettings() async {
@@ -57,6 +61,14 @@ class AppSettings with ChangeNotifier {
       if (ordDateString != null) {
         _ordDate = DateTime.tryParse(ordDateString);
       }
+
+      final enlistmentDateString = prefs.getString('enlistmentDate');
+      if (enlistmentDateString != null) {
+        _enlistmentDate = DateTime.tryParse(enlistmentDateString);
+      }
+
+      _hasCompletedOnboarding =
+          prefs.getBool('hasCompletedOnboarding') ?? false;
 
       notifyListeners();
     } catch (e) {
@@ -96,6 +108,17 @@ class AppSettings with ChangeNotifier {
       } else {
         await prefs.remove('ordDate');
       }
+
+      if (_enlistmentDate != null) {
+        await prefs.setString(
+          'enlistmentDate',
+          _enlistmentDate!.toIso8601String(),
+        );
+      } else {
+        await prefs.remove('enlistmentDate');
+      }
+
+      await prefs.setBool('hasCompletedOnboarding', _hasCompletedOnboarding);
     } catch (e) {
       // Handle errors gracefully, especially in test environments
       debugPrint('Error saving settings: $e');
@@ -148,6 +171,20 @@ class AppSettings with ChangeNotifier {
   void setOrdDate(DateTime? value) {
     if (_ordDate == value) return;
     _ordDate = value;
+    saveSettings();
+    notifyListeners();
+  }
+
+  void setEnlistmentDate(DateTime? value) {
+    if (_enlistmentDate == value) return;
+    _enlistmentDate = value;
+    saveSettings();
+    notifyListeners();
+  }
+
+  void setHasCompletedOnboarding(bool value) {
+    if (_hasCompletedOnboarding == value) return;
+    _hasCompletedOnboarding = value;
     saveSettings();
     notifyListeners();
   }

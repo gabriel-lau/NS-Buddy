@@ -68,4 +68,8 @@ class AppController {
   void setOrdDate(DateTime? value) {
     settings.setOrdDate(value);
   }
+
+  void setEnlistmentDate(DateTime? value) {
+    settings.setEnlistmentDate(value);
+  }
 }
