@@ -269,7 +269,7 @@ class SettingsView extends StatelessWidget {
       context: context,
       initialDate: initialDate ?? DateTime.now(),
       firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365 * 5)),
     );
     if (picked != null && picked != initialDate) {
       onDateSelected(picked);

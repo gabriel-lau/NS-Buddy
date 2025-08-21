@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 import '../controllers/app_controller.dart';
-import '../controllers/counter_controller.dart';
 import '../models/app_settings.dart';
 import 'settings_view.dart';
 
 class HomeView extends StatelessWidget {
   final AppController appController;
-  final CounterController counterController;
 
-  const HomeView({
-    super.key,
-    required this.appController,
-    required this.counterController,
-  });
+  const HomeView({super.key, required this.appController});
 
   @override
   Widget build(BuildContext context) {
     final settings = appController.settings;
     return AnimatedBuilder(
-      animation: Listenable.merge([settings, counterController.counter]),
+      animation: settings,
       builder: (context, _) {
         return DefaultTabController(
           length: 2,
@@ -53,7 +47,7 @@ class HomeView extends StatelessWidget {
             body: TabBarView(
               children: [
                 _IPPTTab(settings: settings),
-                _CounterTab(counterController: counterController),
+                _CounterTab(settings: settings),
               ],
             ),
           ),
@@ -87,6 +81,9 @@ class _IPPTTabState extends State<_IPPTTab> {
   // Local, non-persisted Shiong vocation
   late bool _isShiongVocLocal = false;
 
+  // Tracks if any parameter in the collapsible card was edited by the user
+  bool _isEdited = false;
+
   // Score calculations
   double get _pushUpScore => (_pushUpValue / 60.0) * 40.0;
   double get _sitUpScore => (_sitUpValue / 60.0) * 40.0;
@@ -109,9 +106,16 @@ class _IPPTTabState extends State<_IPPTTab> {
   @override
   void initState() {
     super.initState();
-    _age = _deriveAgeFromDob(widget.settings.dob) ?? 16;
-    _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
-    _isShiongVocLocal = widget.settings.isShiongVoc;
+    _resetParameters();
+  }
+
+  void _resetParameters() {
+    setState(() {
+      _age = _deriveAgeFromDob(widget.settings.dob) ?? 16;
+      _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
+      _isShiongVocLocal = widget.settings.isShiongVoc;
+      _isEdited = false;
+    });
   }
 
   int? _deriveAgeFromDob(DateTime? dob) {
@@ -142,6 +146,7 @@ class _IPPTTabState extends State<_IPPTTab> {
                         // Collapsible card at the top
                         Card(
                           child: ExpansionTile(
+                            shape: Border.all(color: Colors.transparent),
                             title: Row(
                               children: [
                                 Icon(
@@ -186,6 +191,7 @@ class _IPPTTabState extends State<_IPPTTab> {
                                             minAge,
                                             _ageOptions.last,
                                           );
+                                          _isEdited = true;
                                         });
                                       },
                                     ),
@@ -204,6 +210,7 @@ class _IPPTTabState extends State<_IPPTTab> {
                                         if (val == null) return;
                                         setState(() {
                                           _age = val;
+                                          _isEdited = true;
                                         });
                                       },
                                     ),
@@ -220,6 +227,7 @@ class _IPPTTabState extends State<_IPPTTab> {
                                             _ageOptions.first,
                                             maxAge,
                                           );
+                                          _isEdited = true;
                                         });
                                       },
                                     ),
@@ -253,6 +261,7 @@ class _IPPTTabState extends State<_IPPTTab> {
                                           _genderLocal = index == 0
                                               ? 'male'
                                               : 'female';
+                                          _isEdited = true;
                                         });
                                       },
                                       borderRadius: BorderRadius.circular(8),
@@ -299,17 +308,46 @@ class _IPPTTabState extends State<_IPPTTab> {
                                       onChanged: (val) {
                                         setState(() {
                                           _isShiongVocLocal = val;
+                                          _isEdited = true;
                                         });
                                       },
                                     ),
                                   ],
                                 ),
                               ),
-                              const Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Text(
-                                  'Information content will be added here.',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  children: [
+                                    if (_isEdited)
+                                      Chip(
+                                        label: const Text('Edited'),
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        visualDensity: VisualDensity.compact,
+                                        backgroundColor: Theme.of(
+                                          context,
+                                        ).colorScheme.tertiaryContainer,
+                                        labelStyle: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall
+                                            ?.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onTertiaryContainer,
+                                            ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 0,
+                                        ),
+                                      ),
+                                    const Spacer(),
+                                    OutlinedButton.icon(
+                                      onPressed: _resetParameters,
+                                      icon: const Icon(Icons.restart_alt),
+                                      label: const Text('Reset'),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -507,12 +545,23 @@ class _IPPTTabState extends State<_IPPTTab> {
 }
 
 class _CounterTab extends StatelessWidget {
-  final CounterController counterController;
+  final AppSettings settings;
 
-  const _CounterTab({required this.counterController});
+  const _CounterTab({required this.settings});
 
   @override
   Widget build(BuildContext context) {
+    final DateTime? ordDate = settings.ordDate;
+    final DateTime now = DateTime.now();
+    final DateTime today = DateTime(now.year, now.month, now.day);
+    final int? daysToOrd = ordDate == null
+        ? null
+        : DateTime(
+            ordDate.year,
+            ordDate.month,
+            ordDate.day,
+          ).difference(today).inDays.clamp(-999999, 999999);
+
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -524,19 +573,30 @@ class _CounterTab extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(
-                        'You have pushed the button this many times:',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '${counterController.value}',
-                        style: Theme.of(context).textTheme.displayMedium
-                            ?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
+                      if (ordDate == null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'Set your ORD date in Settings to see the countdown.',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      else ...[
+                        Text(
+                          'Days until ORD',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          '${daysToOrd! < 0 ? 0 : daysToOrd}',
+                          style: Theme.of(context).textTheme.displayMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
                       const SizedBox(height: 32),
                       Card(
                         margin: const EdgeInsets.all(16),
@@ -551,21 +611,17 @@ class _CounterTab extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Counter Tab',
+                                'ORD Countdown',
                                 style: Theme.of(context).textTheme.titleMedium,
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Use the button below to increment the counter. The value is persisted using shared_preferences.',
+                                ordDate == null
+                                    ? 'No ORD date set. Go to Settings to configure your ORD date.'
+                                    : 'Counting down the days until your ORD date.',
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton.icon(
-                                onPressed: counterController.increment,
-                                icon: const Icon(Icons.add),
-                                label: const Text('Increment'),
                               ),
                             ],
                           ),

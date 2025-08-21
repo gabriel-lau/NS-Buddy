@@ -1,13 +1,4 @@
-import '../models/counter.dart';
-
+// Deprecated: Counter functionality has been removed.
 class CounterController {
-  final Counter counter;
-
-  CounterController({required this.counter});
-
-  int get value => counter.value;
-
-  void increment() {
-    counter.increment();
-  }
+  const CounterController();
 }
