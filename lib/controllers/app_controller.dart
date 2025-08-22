@@ -62,8 +62,6 @@ class AppController {
   }
 
   void setIsNSF(bool value) {
-    if (!value) setOrdDate(null);
-    if (!value) setEnlistmentDate(null);
     settings.setIsNSF(value);
   }
 

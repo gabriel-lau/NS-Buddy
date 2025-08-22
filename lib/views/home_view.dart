@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert' as convert;
 import '../controllers/app_controller.dart';
 import '../models/app_settings.dart';
 import 'settings_view.dart';
@@ -69,7 +71,10 @@ class _IPPTTab extends StatefulWidget {
 class _IPPTTabState extends State<_IPPTTab> {
   double _pushUpValue = 0;
   double _sitUpValue = 0;
-  double _runValue = 8;
+  double _runValue = 20 * 60;
+
+  Map<String, dynamic>?
+  _ipptData; // Loaded from lib/assets/ippt_score_chart.json
 
   // Local, non-persisted age state
   late int _age = 16;
@@ -81,25 +86,40 @@ class _IPPTTabState extends State<_IPPTTab> {
   // Local, non-persisted Shiong vocation
   late bool _isShiongVocLocal = false;
 
+  late bool _isNSF = true;
+
   // Tracks if any parameter in the collapsible card was edited by the user
   bool _isEdited = false;
 
-  // Score calculations
-  double get _pushUpScore => (_pushUpValue / 60.0) * 40.0;
-  double get _sitUpScore => (_sitUpValue / 60.0) * 40.0;
-  double get _runScore {
-    // Lower time is better: 8min -> best, 20min -> worst
-    final normalized = (20.0 - _runValue) / (20.0 - 8.0);
-    return (normalized.clamp(0.0, 1.0)) * 20.0;
+  int get _pushPoints {
+    if (_ipptData == null) return 0;
+    final String ageGroup = _getAgeGroup(_age);
+    final int pushUps = _pushUpValue.round().clamp(0, 60);
+    return _pointsForReps('push_up', pushUps, ageGroup);
   }
 
-  double get _score =>
-      (_pushUpScore + _sitUpScore + _runScore).clamp(0.0, 100.0);
-  int get _scoreInt => _score.round();
+  int get _sitPoints {
+    if (_ipptData == null) return 0;
+    final String ageGroup = _getAgeGroup(_age);
+    final int sitUps = _sitUpValue.round().clamp(0, 60);
+    return _pointsForReps('sit_up', sitUps, ageGroup);
+  }
+
+  int get _runPoints {
+    if (_ipptData == null) return 0;
+    final String ageGroup = _getAgeGroup(_age);
+    final int runSeconds = _runValue.round().clamp(8 * 60, 18 * 60 + 30);
+    return _pointsForRun(runSeconds, ageGroup);
+  }
+
+  int get _score => _pushPoints + _sitPoints + _runPoints;
+
   String get _award {
     if (_score < 50) return 'fail';
-    if (_score < 70) return 'pass';
-    if (_score < 85) return 'silver';
+    if (_score < 60) return 'pass';
+    if (_score < 75) return 'pass (incentive)';
+    if (_score < 85 && !_isShiongVocLocal) return 'silver';
+    if (_score < 90 && _isShiongVocLocal) return 'silver';
     return 'gold';
   }
 
@@ -107,6 +127,7 @@ class _IPPTTabState extends State<_IPPTTab> {
   void initState() {
     super.initState();
     _resetParameters();
+    _loadIpptJson();
   }
 
   void _resetParameters() {
@@ -114,8 +135,93 @@ class _IPPTTabState extends State<_IPPTTab> {
       _age = _deriveAgeFromDob(widget.settings.dob) ?? 16;
       // _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
       _isShiongVocLocal = widget.settings.isShiongVoc;
+      _isNSF = widget.settings.isNSF;
       _isEdited = false;
     });
+  }
+
+  Future<void> _loadIpptJson() async {
+    try {
+      final String jsonStr = await rootBundle.loadString(
+        'lib/assets/ippt_score_chart.json',
+      );
+      final Map<String, dynamic> data = convert.jsonDecode(jsonStr);
+      setState(() {
+        _ipptData = data;
+      });
+    } catch (e) {
+      // If asset missing or malformed, keep score at 0
+      debugPrint('Failed to load IPPT JSON: $e');
+    }
+  }
+
+  String _getAgeGroup(int age) {
+    if (age < 22) return '<22';
+    if (age <= 24) return '22-24';
+    if (age <= 27) return '25-27';
+    if (age <= 30) return '28-30';
+    if (age <= 33) return '31-33';
+    if (age <= 36) return '34-36';
+    if (age <= 39) return '37-39';
+    if (age <= 42) return '40-42';
+    if (age <= 45) return '43-45';
+    if (age <= 48) return '46-48';
+    if (age <= 51) return '49-51';
+    if (age <= 54) return '52-54';
+    if (age <= 57) return '55-57';
+    return '58-60';
+  }
+
+  int _pointsForReps(String category, int reps, String ageGroup) {
+    final Map<String, dynamic>? scoring =
+        _ipptData?['ippt']?[category]?['scoring'] as Map<String, dynamic>?;
+    if (scoring == null) return 0;
+    final Map<String, dynamic>? row = scoring['$reps'] as Map<String, dynamic>?;
+    if (row == null) return 0;
+    final dynamic value = row[ageGroup];
+    if (value is int) return value;
+    return 0;
+  }
+
+  int _pointsForRun(int runSeconds, String ageGroup) {
+    final Map<String, dynamic>? runTable =
+        _ipptData?['ippt']?['run_2_4km']?['scoring'] as Map<String, dynamic>?;
+    if (runTable == null) return 0;
+
+    int parseTimeToSeconds(String mmss) {
+      final parts = mmss.split(':');
+      if (parts.length != 2) return 0;
+      final int m = int.tryParse(parts[0]) ?? 0;
+      final int s = int.tryParse(parts[1]) ?? 0;
+      return m * 60 + s;
+    }
+
+    // Build sorted list of bucket seconds
+    final List<int> buckets =
+        runTable.keys.map((k) => parseTimeToSeconds(k)).toList()..sort();
+
+    // Choose the smallest bucket that is >= user's time (conservative rounding)
+    int chosen = buckets.last;
+    for (final b in buckets) {
+      if (runSeconds <= b) {
+        chosen = b;
+        break;
+      }
+    }
+
+    String formatSeconds(int secs) {
+      final int m = secs ~/ 60;
+      final int s = secs % 60;
+      final String ss = s.toString().padLeft(2, '0');
+      return '$m:$ss';
+    }
+
+    final Map<String, dynamic>? row =
+        runTable[formatSeconds(chosen)] as Map<String, dynamic>?;
+    if (row == null) return 0;
+    final dynamic value = row[ageGroup];
+    if (value is int) return value;
+    return 0;
   }
 
   int? _deriveAgeFromDob(DateTime? dob) {
@@ -279,7 +385,7 @@ class _IPPTTabState extends State<_IPPTTab> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        'Commando, NDU or Guards?',
+                                        'Commando, NDU or Guards',
                                         style: Theme.of(
                                           context,
                                         ).textTheme.bodyLarge,
@@ -290,6 +396,35 @@ class _IPPTTabState extends State<_IPPTTab> {
                                       onChanged: (val) {
                                         setState(() {
                                           _isShiongVocLocal = val;
+                                          _isEdited = true;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  0,
+                                  16,
+                                  12,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'NSF',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyLarge,
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: _isNSF,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _isNSF = val;
                                           _isEdited = true;
                                         });
                                       },
@@ -362,16 +497,23 @@ class _IPPTTabState extends State<_IPPTTab> {
                                 ),
                                 const SizedBox(height: 24),
                                 // Push-up Slider
-                                Text(
-                                  'Push-ups: ${_pushUpValue.toInt()}',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Push-ups: ${_pushUpValue.toInt()}',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge,
+                                    ),
+                                    Spacer(),
+                                    Text('$_pushPoints Points'),
+                                  ],
                                 ),
                                 Slider(
                                   value: _pushUpValue,
                                   min: 0,
                                   max: 60,
                                   divisions: 60,
-                                  label: _pushUpValue.toInt().toString(),
                                   onChanged: (value) {
                                     setState(() {
                                       _pushUpValue = value;
@@ -380,16 +522,23 @@ class _IPPTTabState extends State<_IPPTTab> {
                                 ),
                                 const SizedBox(height: 16),
                                 // Sit-up Slider
-                                Text(
-                                  'Sit-ups: ${_sitUpValue.toInt()}',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Sit-ups: ${_sitUpValue.toInt()} ',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge,
+                                    ),
+                                    Spacer(),
+                                    Text('$_sitPoints Points'),
+                                  ],
                                 ),
                                 Slider(
                                   value: _sitUpValue,
                                   min: 0,
                                   max: 60,
                                   divisions: 60,
-                                  label: _sitUpValue.toInt().toString(),
                                   onChanged: (value) {
                                     setState(() {
                                       _sitUpValue = value;
@@ -398,16 +547,24 @@ class _IPPTTabState extends State<_IPPTTab> {
                                 ),
                                 const SizedBox(height: 16),
                                 // 2.4km Run Slider
-                                Text(
-                                  '2.4km Run: ${_runValue.toInt()} minutes',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                Row(
+                                  children: [
+                                    Text(
+                                      '2.4km: ${(_runValue / 60).toInt()} mins ${(_runValue % 60).toInt()} sec',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge,
+                                    ),
+                                    Spacer(),
+                                    Text('$_runPoints Points'),
+                                  ],
                                 ),
+
                                 Slider(
                                   value: _runValue,
-                                  min: 8,
-                                  max: 20,
-                                  divisions: 120,
-                                  label: '${_runValue.toStringAsFixed(1)} min',
+                                  min: 8 * 60,
+                                  max: 20 * 60,
+                                  divisions: 72,
                                   onChanged: (value) {
                                     setState(() {
                                       _runValue = value;
@@ -451,39 +608,46 @@ class _IPPTTabState extends State<_IPPTTab> {
             border: Border(top: BorderSide(color: scheme.outlineVariant)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Text(
+                    '$_score Points',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Spacer(),
+                  _buildAwardChip(context),
+                ],
+              ),
+              const SizedBox(height: 6),
               // Progress takes the most space
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'IPPT Score',
-                      style: Theme.of(context).textTheme.labelLarge,
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            semanticsLabel: _score.toString(),
+                            value: _score / 100.0,
+                            minHeight: 8,
+                            backgroundColor: scheme.surfaceContainerHighest,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: _score / 100.0,
-                        minHeight: 8,
-                        backgroundColor: scheme.surfaceContainerHighest,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 16),
-              // Score value
-              Text(
-                '$_scoreInt/100',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(width: 12),
+              const SizedBox(height: 6),
               // Award chip
-              _buildAwardChip(context),
             ],
           ),
         ),
@@ -504,6 +668,10 @@ class _IPPTTabState extends State<_IPPTTab> {
         background = Colors.blueGrey.shade300;
         foreground = Colors.black87;
         break;
+      case 'pass (incentive)':
+        background = Colors.green.shade600;
+        break;
+
       case 'pass':
         background = Colors.green.shade600;
         break;
