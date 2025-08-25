@@ -117,7 +117,8 @@ class _IPPTTabState extends State<_IPPTTab> {
   String get _award {
     if (_score < 50) return 'fail';
     if (_score < 60) return 'pass';
-    if (_score < 75) return 'pass (incentive)';
+    if (_score < 75 && !_isNSF) return 'pass (incentive)';
+    if (_score < 75 && _isNSF) return 'pass';
     if (_score < 85 && !_isShiongVocLocal) return 'silver';
     if (_score < 90 && _isShiongVocLocal) return 'silver';
     return 'gold';
@@ -701,6 +702,7 @@ class _CounterTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DateTime? ordDate = settings.ordDate;
+    final DateTime? enlistmentDate = settings.enlistmentDate;
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
     final int? daysToOrd = ordDate == null
@@ -711,6 +713,18 @@ class _CounterTab extends StatelessWidget {
             ordDate.day,
           ).difference(today).inDays.clamp(-999999, 999999);
 
+    // Calculate percentage elapsed from enlistment to ORD
+    double? percentElapsed;
+    int? totalDays;
+    int? elapsedDays;
+    if (ordDate != null && enlistmentDate != null) {
+      totalDays = ordDate.difference(enlistmentDate).inDays;
+      elapsedDays = today.difference(enlistmentDate).inDays;
+      percentElapsed = totalDays > 0
+          ? (elapsedDays.clamp(0, totalDays) / totalDays)
+          : null;
+    }
+
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -718,66 +732,89 @@ class _CounterTab extends StatelessWidget {
             return SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      if (ordDate == null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'Set your ORD date in Settings to see the countdown.',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      else ...[
-                        Text(
-                          'Days until ORD',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          '${daysToOrd! < 0 ? 0 : daysToOrd}',
-                          style: Theme.of(context).textTheme.displayMedium
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ],
-                      const SizedBox(height: 32),
-                      Card(
-                        margin: const EdgeInsets.all(16),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
+                child: Column(
+                  children: <Widget>[
+                    if (ordDate != null) ...[
+                      const SizedBox(height: 16),
+                      // Circular indicator for percentage elapsed
+                      if (enlistmentDate != null && percentElapsed != null)
+                        SizedBox(
+                          child: Stack(
+                            alignment: Alignment.center,
                             children: [
-                              Icon(
-                                Icons.touch_app,
-                                size: 48,
-                                color: Theme.of(context).colorScheme.primary,
+                              SizedBox(
+                                height: 300,
+                                width: 300,
+                                child: CircularProgressIndicator(
+                                  value: percentElapsed,
+                                  strokeWidth: 10,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainerHighest,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'ORD Countdown',
-                                style: Theme.of(context).textTheme.titleMedium,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                ordDate == null
-                                    ? 'No ORD date set. Go to Settings to configure your ORD date.'
-                                    : 'Counting down the days until your ORD date.',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                textAlign: TextAlign.center,
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '${(percentElapsed * 100).toStringAsFixed(1)}%',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displaySmall
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '${elapsedDays ?? 0} / ${totalDays ?? 0} days',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                      ),
+                      const SizedBox(height: 32),
                     ],
-                  ),
+                    Card(
+                      margin: const EdgeInsets.all(16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 48,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'ORD Countdown',
+                              style: Theme.of(context).textTheme.titleMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              ordDate == null
+                                  ? 'No ORD date set. Go to Settings to configure your ORD date.'
+                                  : 'Counting down the days until your ORD date.',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
