@@ -240,11 +240,10 @@ class _IPPTTabState extends State<_IPPTTab> {
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return Stack(
+          return Column(
             children: [
-              SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              Expanded(
+                child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -571,9 +570,9 @@ class _IPPTTabState extends State<_IPPTTab> {
                                     });
                                   },
                                 ),
-                                const SizedBox(
-                                  height: 120,
-                                ), // Spacer so bottom bar does not overlap content
+                                // const SizedBox(
+                                //   height: 120,
+                                // ), // Spacer so bottom bar does not overlap content
                               ],
                             ),
                           ),
