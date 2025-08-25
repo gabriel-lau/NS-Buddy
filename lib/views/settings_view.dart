@@ -181,12 +181,6 @@ class SettingsView extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 16),
-                              Text(
-                                'Material 3 with Dynamic Colors',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
                               SwitchListTile(
                                 title: const Text('Dynamic Colors'),
                                 subtitle: Text(

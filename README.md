@@ -1,3 +1,8 @@
+- [ ] Add data binding with ChangeNotifier and notifyListeners
+- [ ] Proper theme colour options
+- [ ] Clear logic for isNSF and dates
+- [ ] Google Ads integration (AdMob)
+
 # Flutter Application 1
 
 A Flutter application with Material 3 design system integration and dynamic colors support.

@@ -701,7 +701,7 @@ class _CounterTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime? ordDate = settings.ordDate;
+    DateTime? ordDate = settings.ordDate;
     final DateTime? enlistmentDate = settings.enlistmentDate;
     final DateTime now = DateTime.now();
     final DateTime today = DateTime(now.year, now.month, now.day);
