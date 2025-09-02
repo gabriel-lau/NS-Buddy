@@ -728,7 +728,7 @@ class _CounterTab extends StatelessWidget {
 
   // Helper method to calculate weekdays left
   int _calculateWeekdaysLeft(DateTime from, DateTime? to) {
-    to ??= DateTime.now();
+    if (to == null) return 0;
     int weekdaysCount = 0;
     DateTime current = DateTime(from.year, from.month, from.day);
 
@@ -745,7 +745,7 @@ class _CounterTab extends StatelessWidget {
 
   // Helper method to calculate weekends left
   int _calculateWeekendsLeft(DateTime from, DateTime? to) {
-    to ??= DateTime.now();
+    if (to == null) return 0;
     int weekendsCount = 0;
     DateTime current = DateTime(from.year, from.month, from.day);
 
@@ -883,6 +883,7 @@ class _CounterTab extends StatelessWidget {
                             height: 300,
                             width: 300,
                             child: CircularProgressIndicator(
+                              padding: const EdgeInsets.all(8),
                               value: percentElapsed,
                               strokeWidth: 10,
                               backgroundColor: Theme.of(

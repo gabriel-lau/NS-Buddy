@@ -188,8 +188,12 @@ class SettingsView extends StatelessWidget {
                                       : 'Using light theme',
                                 ),
                                 value: settings.isDarkMode,
-                                onChanged: (value) =>
-                                    appController.toggleThemeMode(),
+                                onChanged: (value) {
+                                  if (value) {
+                                    appController.setDynamicColors(!value);
+                                  }
+                                  appController.toggleThemeMode();
+                                },
                                 secondary: Icon(
                                   settings.isDarkMode
                                       ? Icons.dark_mode
@@ -215,46 +219,6 @@ class SettingsView extends StatelessWidget {
                           ),
                         ),
                       ),
-
-                      // Color Scheme Preview
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Color Scheme Preview',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _buildColorPreview(
-                                  context,
-                                  'Primary',
-                                  Theme.of(context).colorScheme.primary,
-                                ),
-                                _buildColorPreview(
-                                  context,
-                                  'Secondary',
-                                  Theme.of(context).colorScheme.secondary,
-                                ),
-                                _buildColorPreview(
-                                  context,
-                                  'Tertiary',
-                                  Theme.of(context).colorScheme.tertiary,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -263,27 +227,6 @@ class SettingsView extends StatelessWidget {
           },
         ),
       ),
-    );
-  }
-
-  Widget _buildColorPreview(BuildContext context, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-              width: 1,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-      ],
     );
   }
 
