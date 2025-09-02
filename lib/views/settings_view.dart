@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
+import 'package:ns_buddy/views/onboarding_view.dart' show OnboardingView;
 import '../controllers/app_controller.dart';
 
 class SettingsView extends StatelessWidget {
@@ -100,57 +101,45 @@ class SettingsView extends StatelessWidget {
                                 onChanged: appController.setIsShiongVoc,
                               ),
 
-                              // Is NSF
-                              SwitchListTile(
-                                title: const Text('NSF'),
-                                subtitle: const Text(
-                                  'Are you currently serving NS?',
+                              // Enlistment Date
+                              ListTile(
+                                title: const Text('Enlistment Date'),
+                                subtitle: Text(
+                                  settings.enlistmentDate != null
+                                      ? '${settings.enlistmentDate!.day}/${settings.enlistmentDate!.month}/${settings.enlistmentDate!.year}'
+                                      : 'Not set',
                                 ),
-                                value: settings.isNSF,
-                                onChanged: appController.setIsNSF,
+                                trailing: const Icon(Icons.calendar_today),
+                                onTap: () => _selectDate(
+                                  context,
+                                  settings.enlistmentDate,
+                                  DateTime(1900),
+                                  Jiffy.now().add(years: 5).dateTime,
+                                  (date) {
+                                    appController.setEnlistmentDate(date);
+                                  },
+                                ),
                               ),
 
-                              // Enlistment Date (only show if NSF)
-                              if (settings.isNSF)
-                                ListTile(
-                                  title: const Text('Enlistment Date'),
-                                  subtitle: Text(
-                                    settings.enlistmentDate != null
-                                        ? '${settings.enlistmentDate!.day}/${settings.enlistmentDate!.month}/${settings.enlistmentDate!.year}'
-                                        : 'Not set',
-                                  ),
-                                  trailing: const Icon(Icons.calendar_today),
-                                  onTap: () => _selectDate(
-                                    context,
-                                    settings.enlistmentDate,
-                                    DateTime(1900),
-                                    Jiffy.now().add(years: 5).dateTime,
-                                    (date) {
-                                      appController.setEnlistmentDate(date);
-                                    },
-                                  ),
+                              // ORD Date
+                              ListTile(
+                                title: const Text('ORD Date'),
+                                subtitle: Text(
+                                  settings.ordDate != null
+                                      ? '${settings.ordDate!.day}/${settings.ordDate!.month}/${settings.ordDate!.year}'
+                                      : 'Not set',
                                 ),
-
-                              // ORD Date (only show if)
-                              if (settings.isNSF)
-                                ListTile(
-                                  title: const Text('ORD Date'),
-                                  subtitle: Text(
-                                    settings.ordDate != null
-                                        ? '${settings.ordDate!.day}/${settings.ordDate!.month}/${settings.ordDate!.year}'
-                                        : 'Not set',
-                                  ),
-                                  trailing: const Icon(Icons.calendar_today),
-                                  onTap: () => _selectDate(
-                                    context,
-                                    settings.ordDate,
-                                    DateTime(1900),
-                                    Jiffy.now().add(years: 5).dateTime,
-                                    (date) {
-                                      appController.setOrdDate(date);
-                                    },
-                                  ),
+                                trailing: const Icon(Icons.calendar_today),
+                                onTap: () => _selectDate(
+                                  context,
+                                  settings.ordDate,
+                                  DateTime(1900),
+                                  Jiffy.now().add(years: 5).dateTime,
+                                  (date) {
+                                    appController.setOrdDate(date);
+                                  },
                                 ),
+                              ),
                             ],
                           ),
                         ),
@@ -206,6 +195,21 @@ class SettingsView extends StatelessWidget {
                                       ? Icons.dark_mode
                                       : Icons.light_mode,
                                 ),
+                              ),
+                              // Reset Settings
+                              TextButton(
+                                onPressed: () {
+                                  appController.resetSettings();
+                                  // Transition to onboarding flow
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => OnboardingView(
+                                        appController: appController,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Reset to Default'),
                               ),
                             ],
                           ),

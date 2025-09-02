@@ -136,7 +136,12 @@ class _IPPTTabState extends State<_IPPTTab> {
       _age = _deriveAgeFromDob(widget.settings.dob) ?? 16;
       // _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
       _isShiongVocLocal = widget.settings.isShiongVoc;
-      _isNSF = widget.settings.isNSF;
+      // If DateTime.now() is still between enlistment date and ORD date, assume NSF
+      _isNSF =
+          widget.settings.enlistmentDate != null &&
+          widget.settings.ordDate != null &&
+          DateTime.now().isAfter(widget.settings.enlistmentDate!) &&
+          DateTime.now().isBefore(widget.settings.ordDate!);
       _isEdited = false;
     });
   }
@@ -800,9 +805,11 @@ class _CounterTab extends StatelessWidget {
     double? percentElapsed = 0;
     int? totalDays;
     int? elapsedDays;
+    int? remainingDays;
     if (ordDate != null && enlistmentDate != null) {
       totalDays = ordDate.difference(enlistmentDate).inDays;
       elapsedDays = today.difference(enlistmentDate).inDays;
+      remainingDays = ordDate.difference(today).inDays;
       percentElapsed = totalDays > 0
           ? (elapsedDays.clamp(0, totalDays) / totalDays)
           : null;
@@ -817,53 +824,56 @@ class _CounterTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Card(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.tertiaryContainer,
-                            margin: const EdgeInsets.all(16),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.numbers,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.tertiary,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'ORD Countdown',
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.titleMedium,
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    ordDate == null
-                                        ? 'No ORD date set. Go to Settings to configure your ORD date.'
-                                        : 'Counting down the days until your ORD date.',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
+                    if (ordDate == null || enlistmentDate == null)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Card(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.tertiaryContainer,
+                              margin: const EdgeInsets.all(16),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.numbers,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.tertiary,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'ORD Countdown',
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      enlistmentDate == null
+                                          ? 'No enlistment date set. Go to Settings to configure your enlistment date.'
+                                          : ordDate == null
+                                          ? 'No ORD date set. Go to Settings to configure your ORD date.'
+                                          : 'Counting down the days until your ORD date.',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                     // Circular indicator for percentage elapsed
                     SizedBox(
                       child: Stack(
@@ -888,12 +898,18 @@ class _CounterTab extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                '${(percentElapsed! * 100).toStringAsFixed(1)}%',
+                                remainingDays == null
+                                    ? 'N/A'
+                                    : '${remainingDays.abs()}',
                                 style: Theme.of(context).textTheme.displaySmall
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                '${elapsedDays ?? 0} / ${totalDays ?? 0} days',
+                                remainingDays == null
+                                    ? 'No ORD date set'
+                                    : remainingDays < 0
+                                    ? 'days since ORD'
+                                    : 'remaining days',
                                 style: Theme.of(context).textTheme.titleLarge
                                     ?.copyWith(
                                       color: Theme.of(
@@ -941,9 +957,9 @@ class _CounterTab extends StatelessWidget {
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     crossAxisCount: 3,
-                                    childAspectRatio: 2.5,
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 2,
+                                    crossAxisSpacing: 4,
+                                    mainAxisSpacing: 4,
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 8,
                                     ),

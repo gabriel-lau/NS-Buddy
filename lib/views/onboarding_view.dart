@@ -16,7 +16,6 @@ class _OnboardingViewState extends State<OnboardingView> {
   DateTime? _dob;
   // String? _gender; // temporarily disabled
   bool _isShiongVoc = false;
-  bool _isNSF = false;
   DateTime? _ordDate;
   DateTime? _enlistmentDate;
 
@@ -29,7 +28,6 @@ class _OnboardingViewState extends State<OnboardingView> {
     _dob = s.dob;
     // _gender = s.gender;
     _isShiongVoc = s.isShiongVoc;
-    _isNSF = s.isNSF;
     _ordDate = s.ordDate;
     _enlistmentDate = s.enlistmentDate;
   }
@@ -59,10 +57,6 @@ class _OnboardingViewState extends State<OnboardingView> {
     final List<String> missing = [];
     if (_dob == null) missing.add('Date of Birth');
     // if (_gender == null) missing.add('Gender'); // disabled
-    if (_isNSF && _enlistmentDate == null) {
-      missing.add('Enlistment Date (required for NSF)');
-    }
-    if (_isNSF && _ordDate == null) missing.add('ORD Date (required for NSF)');
     if (missing.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please complete: ${missing.join(', ')}')),
@@ -73,7 +67,6 @@ class _OnboardingViewState extends State<OnboardingView> {
     settings.setDob(_dob);
     // settings.setGender(_gender); // disabled
     settings.setIsShiongVoc(_isShiongVoc);
-    settings.setIsNSF(_isNSF);
     settings.setEnlistmentDate(_enlistmentDate);
     settings.setOrdDate(_ordDate);
     settings.setHasCompletedOnboarding(true);
@@ -179,61 +172,49 @@ class _OnboardingViewState extends State<OnboardingView> {
                                       setState(() => _isShiongVoc = v),
                                 ),
 
-                                // NSF
-                                SwitchListTile(
-                                  title: const Text('NSF'),
-                                  subtitle: const Text(
-                                    'Are you currently serving NS?',
+                                // Enlistment Date
+                                ListTile(
+                                  title: const Text('Enlistment Date'),
+                                  subtitle: Text(
+                                    _enlistmentDate != null
+                                        ? _formatDmy(_enlistmentDate!)
+                                        : 'Not set',
                                   ),
-                                  value: _isNSF,
-                                  onChanged: (v) => setState(() => _isNSF = v),
+                                  trailing: const Icon(Icons.calendar_today),
+                                  onTap: () => _pickDate(
+                                    context,
+                                    (date) {
+                                      setState(() => _enlistmentDate = date);
+                                    },
+                                    initialDate: _enlistmentDate,
+                                    firstDate: DateTime(1960),
+                                    lastDate: Jiffy.now()
+                                        .add(years: 5)
+                                        .dateTime,
+                                  ),
                                 ),
 
-                                // Enlistment Date (only show if NSF)
-                                if (_isNSF)
-                                  ListTile(
-                                    title: const Text('Enlistment Date'),
-                                    subtitle: Text(
-                                      _enlistmentDate != null
-                                          ? _formatDmy(_enlistmentDate!)
-                                          : 'Not set',
-                                    ),
-                                    trailing: const Icon(Icons.calendar_today),
-                                    onTap: () => _pickDate(
-                                      context,
-                                      (date) {
-                                        setState(() => _enlistmentDate = date);
-                                      },
-                                      initialDate: _enlistmentDate,
-                                      firstDate: DateTime(1960),
-                                      lastDate: Jiffy.now()
-                                          .add(years: 5)
-                                          .dateTime,
-                                    ),
+                                // ORD Date
+                                ListTile(
+                                  title: const Text('ORD Date'),
+                                  subtitle: Text(
+                                    _ordDate != null
+                                        ? _formatDmy(_ordDate!)
+                                        : 'Not set',
                                   ),
-
-                                // ORD Date (only show if NSF)
-                                if (_isNSF)
-                                  ListTile(
-                                    title: const Text('ORD Date'),
-                                    subtitle: Text(
-                                      _ordDate != null
-                                          ? _formatDmy(_ordDate!)
-                                          : 'Not set',
-                                    ),
-                                    trailing: const Icon(Icons.calendar_today),
-                                    onTap: () => _pickDate(
-                                      context,
-                                      (date) {
-                                        setState(() => _ordDate = date);
-                                      },
-                                      initialDate: _ordDate,
-                                      firstDate: DateTime(1960),
-                                      lastDate: Jiffy.now()
-                                          .add(years: 5)
-                                          .dateTime,
-                                    ),
+                                  trailing: const Icon(Icons.calendar_today),
+                                  onTap: () => _pickDate(
+                                    context,
+                                    (date) {
+                                      setState(() => _ordDate = date);
+                                    },
+                                    initialDate: _ordDate,
+                                    firstDate: DateTime(1960),
+                                    lastDate: Jiffy.now()
+                                        .add(years: 5)
+                                        .dateTime,
                                   ),
+                                ),
                               ],
                             ),
                           ),

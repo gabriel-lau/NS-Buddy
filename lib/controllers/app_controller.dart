@@ -61,15 +61,15 @@ class AppController {
     settings.setIsShiongVoc(value);
   }
 
-  void setIsNSF(bool value) {
-    settings.setIsNSF(value);
-  }
-
   void setOrdDate(DateTime? value) {
     settings.setOrdDate(value);
   }
 
   void setEnlistmentDate(DateTime? value) {
     settings.setEnlistmentDate(value);
+  }
+
+  void resetSettings() {
+    settings.resetToDefault();
   }
 }
