@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'controllers/app_controller.dart';
 import 'models/app_settings.dart';
 import 'views/home_view.dart';
@@ -50,14 +51,22 @@ class _MyAppState extends State<MyApp> {
     return AnimatedBuilder(
       animation: _settings,
       builder: (context, _) {
-        return MaterialApp(
-          title: 'NS Buddy',
-          theme: _appController.buildLightTheme(),
-          darkTheme: _appController.buildDarkTheme(),
-          themeMode: _appController.themeMode,
-          home: _settings.hasCompletedOnboarding
-              ? HomeView(appController: _appController)
-              : OnboardingView(appController: _appController),
+        return DynamicColorBuilder(
+          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+            return MaterialApp(
+              title: 'NS Buddy',
+              theme: _appController.buildLightTheme(
+                dynamicScheme: lightDynamic,
+              ),
+              darkTheme: _appController.buildDarkTheme(
+                dynamicScheme: darkDynamic,
+              ),
+              themeMode: _appController.themeMode,
+              home: _settings.hasCompletedOnboarding
+                  ? HomeView(appController: _appController)
+                  : OnboardingView(appController: _appController),
+            );
+          },
         );
       },
     );

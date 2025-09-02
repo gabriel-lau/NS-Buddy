@@ -14,29 +14,29 @@ class AppController {
   ThemeMode get themeMode =>
       settings.isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
-  ThemeData buildLightTheme() {
+  ThemeData buildLightTheme({ColorScheme? dynamicScheme}) {
+    if (settings.useDynamicColors && dynamicScheme != null) {
+      return ThemeData(useMaterial3: true, colorScheme: dynamicScheme);
+    }
     return ThemeData(
       useMaterial3: true,
-      colorScheme: settings.useDynamicColors
-          ? null
-          : ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
-              brightness: Brightness.light,
-            ),
-      colorSchemeSeed: settings.useDynamicColors ? Colors.deepPurple : null,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.deepPurple,
+        brightness: Brightness.light,
+      ),
     );
   }
 
-  ThemeData buildDarkTheme() {
+  ThemeData buildDarkTheme({ColorScheme? dynamicScheme}) {
+    if (settings.useDynamicColors && dynamicScheme != null) {
+      return ThemeData(useMaterial3: true, colorScheme: dynamicScheme);
+    }
     return ThemeData(
       useMaterial3: true,
-      colorScheme: settings.useDynamicColors
-          ? null
-          : ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
-              brightness: Brightness.dark,
-            ),
-      colorSchemeSeed: settings.useDynamicColors ? Colors.deepPurple : null,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.deepPurple,
+        brightness: Brightness.dark,
+      ),
     );
   }
 
