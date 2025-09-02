@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
+import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
+import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
 import 'package:ns_buddy/views/onboarding_view.dart' show OnboardingView;
 import '../controllers/app_controller.dart';
 
@@ -189,15 +191,148 @@ class SettingsView extends StatelessWidget {
                                 ),
                                 value: settings.isDarkMode,
                                 onChanged: (value) {
-                                  if (value) {
-                                    appController.setDynamicColors(!value);
-                                  }
+                                  appController.setDynamicColors(false);
                                   appController.toggleThemeMode();
                                 },
                                 secondary: Icon(
                                   settings.isDarkMode
                                       ? Icons.dark_mode
                                       : Icons.light_mode,
+                                ),
+                              ),
+                              RadioListTile(
+                                value: ThemeOption.system,
+                                groupValue: settings.theme,
+                                title: const Text('Follow System Theme'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setTheme(value);
+                                  }
+                                },
+                              ),
+                              RadioListTile(
+                                value: ThemeOption.light,
+                                groupValue: settings.theme,
+                                title: const Text('Light Theme'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setTheme(value);
+                                  }
+                                },
+                              ),
+                              RadioListTile(
+                                value: ThemeOption.dark,
+                                groupValue: settings.theme,
+                                title: const Text('Dark Theme'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setTheme(value);
+                                  }
+                                },
+                              ),
+
+                              const SizedBox(height: 16.0),
+                              RadioListTile(
+                                value: ColourOption.system,
+                                groupValue: settings.primaryColour,
+                                title: const Text('System Accent Color'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setPrimaryColour(value);
+                                  }
+                                },
+                              ),
+                              RadioListTile(
+                                value: ColourOption.red,
+                                groupValue: settings.primaryColour,
+                                title: const Text('Red'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setPrimaryColour(value);
+                                  }
+                                },
+                              ),
+                              RadioListTile(
+                                value: ColourOption.green,
+                                groupValue: settings.primaryColour,
+                                title: const Text('Green'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setPrimaryColour(value);
+                                  }
+                                },
+                              ),
+                              RadioListTile(
+                                value: ColourOption.blue,
+                                groupValue: settings.primaryColour,
+                                title: const Text('Blue'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setPrimaryColour(value);
+                                  }
+                                },
+                              ),
+                              RadioListTile(
+                                value: ColourOption.deepPurple,
+                                groupValue: settings.primaryColour,
+                                title: const Text('Deep Purple'),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    appController.setPrimaryColour(value);
+                                  }
+                                },
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Primary Colour',
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.bodyLarge,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 24.0,
+                                                height: 24.0,
+                                                color: Colors.red,
+                                              ),
+                                              SizedBox(width: 8.0),
+                                              Container(
+                                                width: 24.0,
+                                                height: 24.0,
+                                                color: Colors.green,
+                                              ),
+                                              SizedBox(width: 8.0),
+                                              Container(
+                                                width: 24.0,
+                                                height: 24.0,
+                                                color: Colors.blue,
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            'This is a custom subtitle for a more flexible layout.',
+                                            style: TextStyle(
+                                              fontSize: Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium?.fontSize,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               // Reset Settings

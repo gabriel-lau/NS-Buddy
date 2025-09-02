@@ -1,9 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
+import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSettings with ChangeNotifier {
   bool _useDynamicColors;
   bool _isDarkMode;
+  ThemeOption _theme;
+  ColourOption _primaryColour;
 
   // User information fields
   DateTime? _dob;
@@ -19,13 +23,20 @@ class AppSettings with ChangeNotifier {
   AppSettings({
     bool useDynamicColors = true,
     bool isDarkMode = false,
+    ThemeOption theme = ThemeOption.system,
+    ColourOption primaryColour = ColourOption.system,
     bool disablePersistence = false,
   }) : _useDynamicColors = useDynamicColors,
        _isDarkMode = isDarkMode,
+       _theme = theme,
+       _primaryColour = primaryColour,
        _disablePersistence = disablePersistence;
 
   bool get useDynamicColors => _useDynamicColors;
   bool get isDarkMode => _isDarkMode;
+
+  ThemeOption get theme => _theme;
+  ColourOption get primaryColour => _primaryColour;
 
   // Getters for user information
   DateTime? get dob => _dob;
@@ -44,6 +55,25 @@ class AppSettings with ChangeNotifier {
 
       _useDynamicColors = prefs.getBool('useDynamicColors') ?? true;
       _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+      final themeModeStr = prefs.getString('themeMode');
+      if (themeModeStr != null) {
+        _theme = ThemeOption.values.firstWhere(
+          (e) => e.name == themeModeStr,
+          orElse: () => ThemeOption.system,
+        );
+      } else {
+        _theme = ThemeOption.system;
+      }
+
+      final primaryColourStr = prefs.getString('primaryColour');
+      if (primaryColourStr != null) {
+        _primaryColour = ColourOption.values.firstWhere(
+          (e) => e.name == primaryColourStr,
+          orElse: () => ColourOption.system,
+        );
+      } else {
+        _primaryColour = ColourOption.system;
+      }
 
       // Load user information
       final dobString = prefs.getString('dob');
@@ -83,6 +113,8 @@ class AppSettings with ChangeNotifier {
 
       await prefs.setBool('useDynamicColors', _useDynamicColors);
       await prefs.setBool('isDarkMode', _isDarkMode);
+      await prefs.setString('themeMode', _theme.name);
+      await prefs.setString('primaryColour', _primaryColour.name);
 
       // Save user information
       if (_dob != null) {
@@ -131,6 +163,20 @@ class AppSettings with ChangeNotifier {
   void setDarkMode(bool value) {
     if (_isDarkMode == value) return;
     _isDarkMode = value;
+    saveSettings();
+    notifyListeners();
+  }
+
+  void setTheme(ThemeOption theme) {
+    if (_theme == theme) return;
+    _theme = theme;
+    saveSettings();
+    notifyListeners();
+  }
+
+  void setPrimaryColour(ColourOption colour) {
+    if (_primaryColour == colour) return;
+    _primaryColour = colour;
     saveSettings();
     notifyListeners();
   }

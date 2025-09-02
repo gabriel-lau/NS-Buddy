@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
+import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
 import '../models/app_settings.dart';
 
 class AppController {
@@ -11,19 +13,34 @@ class AppController {
     await settings.loadSettings();
   }
 
-  ThemeMode get themeMode =>
-      settings.isDarkMode ? ThemeMode.dark : ThemeMode.light;
+  ThemeMode get themeMode => ThemeOption.system == settings.theme
+      ? ThemeMode.system
+      : settings.theme == ThemeOption.dark
+      ? ThemeMode.dark
+      : ThemeMode.light;
+
+  MaterialColor get primarySwatch {
+    switch (settings.primaryColour) {
+      case ColourOption.red:
+        return Colors.red;
+      case ColourOption.green:
+        return Colors.green;
+      case ColourOption.blue:
+        return Colors.blue;
+      default:
+        return Colors.deepPurple; // Default fallback
+    }
+  }
 
   ThemeData buildLightTheme({ColorScheme? dynamicScheme}) {
-    if (settings.useDynamicColors && dynamicScheme != null) {
-      return ThemeData(useMaterial3: true, colorScheme: dynamicScheme);
-    }
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurple,
-        brightness: Brightness.light,
-      ),
+      colorScheme: settings.primaryColour == ColourOption.system
+          ? dynamicScheme
+          : ColorScheme.fromSeed(
+              seedColor: primarySwatch,
+              brightness: Brightness.light,
+            ),
     );
   }
 
@@ -34,7 +51,7 @@ class AppController {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.deepPurple,
+        seedColor: primarySwatch,
         brightness: Brightness.dark,
       ),
     );
@@ -46,6 +63,14 @@ class AppController {
 
   void setDynamicColors(bool value) {
     settings.setUseDynamicColors(value);
+  }
+
+  void setTheme(ThemeOption theme) {
+    settings.setTheme(theme);
+  }
+
+  void setPrimaryColour(ColourOption colour) {
+    settings.setPrimaryColour(colour);
   }
 
   // User information methods
