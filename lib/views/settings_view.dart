@@ -172,34 +172,34 @@ class SettingsView extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 16),
-                              SwitchListTile(
-                                title: const Text('Dynamic Colors'),
-                                subtitle: Text(
-                                  settings.useDynamicColors
-                                      ? 'Using system accent colors'
-                                      : 'Using static colors',
-                                ),
-                                value: settings.useDynamicColors,
-                                onChanged: appController.setDynamicColors,
-                              ),
-                              SwitchListTile(
-                                title: const Text('Dark Mode'),
-                                subtitle: Text(
-                                  settings.isDarkMode
-                                      ? 'Using dark theme'
-                                      : 'Using light theme',
-                                ),
-                                value: settings.isDarkMode,
-                                onChanged: (value) {
-                                  appController.setDynamicColors(false);
-                                  appController.toggleThemeMode();
-                                },
-                                secondary: Icon(
-                                  settings.isDarkMode
-                                      ? Icons.dark_mode
-                                      : Icons.light_mode,
-                                ),
-                              ),
+                              // SwitchListTile(
+                              //   title: const Text('Dynamic Colors'),
+                              //   subtitle: Text(
+                              //     settings.useDynamicColors
+                              //         ? 'Using system accent colors'
+                              //         : 'Using static colors',
+                              //   ),
+                              //   value: settings.useDynamicColors,
+                              //   onChanged: appController.setDynamicColors,
+                              // ),
+                              // SwitchListTile(
+                              //   title: const Text('Dark Mode'),
+                              //   subtitle: Text(
+                              //     settings.isDarkMode
+                              //         ? 'Using dark theme'
+                              //         : 'Using light theme',
+                              //   ),
+                              //   value: settings.isDarkMode,
+                              //   onChanged: (value) {
+                              //     appController.setDynamicColors(false);
+                              //     appController.toggleThemeMode();
+                              //   },
+                              //   secondary: Icon(
+                              //     settings.isDarkMode
+                              //         ? Icons.dark_mode
+                              //         : Icons.light_mode,
+                              //   ),
+                              // ),
                               RadioListTile(
                                 value: ThemeOption.system,
                                 groupValue: settings.theme,

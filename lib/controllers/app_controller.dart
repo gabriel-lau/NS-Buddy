@@ -45,15 +45,14 @@ class AppController {
   }
 
   ThemeData buildDarkTheme({ColorScheme? dynamicScheme}) {
-    if (settings.useDynamicColors && dynamicScheme != null) {
-      return ThemeData(useMaterial3: true, colorScheme: dynamicScheme);
-    }
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primarySwatch,
-        brightness: Brightness.dark,
-      ),
+      colorScheme: settings.primaryColour == ColourOption.system
+          ? dynamicScheme
+          : ColorScheme.fromSeed(
+              seedColor: primarySwatch,
+              brightness: Brightness.dark,
+            ),
     );
   }
 
