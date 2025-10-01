@@ -9,8 +9,8 @@ import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/domain/usecases/settings_usecases_impl.dart';
 import 'package:ns_buddy/domain/usecases/user_info_usecases_impl.dart';
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
-import 'views/home_view.dart';
-import 'views/onboarding_view.dart';
+import 'presentation/views/home_view.dart';
+import 'presentation/views/onboarding_view.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -28,13 +28,10 @@ class _MyAppState extends State<MyApp> {
   // late final AppSettings _settings;
   // late final AppController _appController;
 
-  late final SettingsEntity settings;
-
   late final SharedPreferenceDataSource _localDataSource =
       SharedPreferenceDataSource();
   late final SettingsUsecases settingsUsecases; // Assume initialized elsewhere
   late final UserInfoUsecases userInfoUsecases; // Assume initialized elsewhere
-  late final TempViewModel tempViewModel;
   bool _isInitialized = false;
 
   @override
@@ -49,17 +46,14 @@ class _MyAppState extends State<MyApp> {
     userInfoUsecases = UserInfoUsecasesImpl(
       UserInfoRepositoryImpl(_localDataSource),
     );
-    tempViewModel = TempViewModel(
-      settingsUsecases: settingsUsecases,
-      userInfoUsecases: userInfoUsecases,
-    );
     _initializeApp();
   }
 
   Future<void> _initializeApp() async {
     // Load persisted settings
     // await _appController.initializeSettings();
-    await tempViewModel.initializeSettings();
+    await settingsUsecases.retrieveSettings();
+    await userInfoUsecases.retrieveUserInfo();
 
     if (mounted) {
       setState(() {
@@ -99,8 +93,15 @@ class _MyAppState extends State<MyApp> {
     //   },
     // );
 
-    return ChangeNotifierProvider(
-      create: (_) => tempViewModel,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<UserInfoUsecases>(
+          create: (_) => userInfoUsecases,
+        ),
+        ChangeNotifierProvider<SettingsUsecases>(
+          create: (_) => settingsUsecases,
+        ),
+      ],
       child: MaterialApp(
         title: 'NS Buddy',
         theme: ThemeData(

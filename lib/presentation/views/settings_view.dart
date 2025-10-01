@@ -3,7 +3,8 @@ import 'package:jiffy/jiffy.dart' show Jiffy;
 import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
 import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
-import 'package:ns_buddy/views/onboarding_view.dart' show OnboardingView;
+import 'package:ns_buddy/presentation/views/onboarding_view.dart'
+    show OnboardingView;
 import 'package:provider/provider.dart';
 
 class SettingsView extends StatelessWidget {
