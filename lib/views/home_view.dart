@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:ns_buddy/domain/entities/settings_entity.dart';
+import 'package:ns_buddy/domain/entities/user_info_entity.dart';
+import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'dart:convert' as convert;
 import '../controllers/app_controller.dart';
 import '../models/app_settings.dart';
 import 'settings_view.dart';
 
 class HomeView extends StatelessWidget {
-  final AppController appController;
+  // final AppController appController;
+  final TempViewModel tempViewModel;
 
-  const HomeView({super.key, required this.appController});
+  const HomeView({super.key, required this.tempViewModel});
 
   @override
   Widget build(BuildContext context) {
-    final settings = appController.settings;
     return AnimatedBuilder(
-      animation: settings,
+      animation: tempViewModel,
       builder: (context, _) {
         return DefaultTabController(
           length: 2,
@@ -31,7 +34,7 @@ class HomeView extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) =>
-                            SettingsView(appController: appController),
+                            SettingsView(tempViewModel: tempViewModel),
                       ),
                     );
                   },
@@ -48,8 +51,8 @@ class HomeView extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
-                _IPPTTab(settings: settings),
-                _CounterTab(settings: settings),
+                _IPPTTab(settings: tempViewModel.userInfo),
+                _CounterTab(settings: tempViewModel.userInfo),
               ],
             ),
           ),
@@ -60,7 +63,7 @@ class HomeView extends StatelessWidget {
 }
 
 class _IPPTTab extends StatefulWidget {
-  final AppSettings settings;
+  final UserInfoEntity settings;
 
   const _IPPTTab({required this.settings});
 
@@ -697,7 +700,7 @@ class _IPPTTabState extends State<_IPPTTab> {
 }
 
 class _CounterTab extends StatelessWidget {
-  final AppSettings settings;
+  final UserInfoEntity settings;
 
   const _CounterTab({required this.settings});
 

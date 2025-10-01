@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:ns_buddy/data/models/settings_model.dart';
 import 'package:ns_buddy/data/models/user_info_model.dart';
+import 'package:ns_buddy/enums/colour_option.dart';
+import 'package:ns_buddy/enums/theme_option.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceDataSource {
@@ -14,8 +16,17 @@ class SharedPreferenceDataSource {
       return SettingsModel.fromJson(
         Map<String, dynamic>.from(jsonDecode(settingsJson)),
       );
+    } else {
+      SettingsModel settingsModel = SettingsModel(
+        useDynamicColors: true,
+        isDarkMode: false,
+        theme: ThemeOption.system,
+        primaryColour: ColourOption.system,
+        disablePersistence: false,
+      );
+      await saveSettings(settingsModel);
+      return settingsModel;
     }
-    throw Exception('No settings found');
   }
 
   Future<void> saveSettings(SettingsModel settings) async {
@@ -36,7 +47,14 @@ class SharedPreferenceDataSource {
         Map<String, dynamic>.from(jsonDecode(userInfoJson)),
       );
     }
-    throw Exception('No user info found');
+    UserInfoModel userInfoModel = UserInfoModel(
+      dob: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      isShiongVoc: false,
+      ordDate: DateTime.now().add(const Duration(days: 365 * 2 + 30)),
+      enlistmentDate: DateTime.now().add(const Duration(days: 30)),
+    );
+    await saveUserInfo(userInfoModel);
+    return userInfoModel;
   }
 
   Future<void> saveUserInfo(UserInfoModel userInfo) async {

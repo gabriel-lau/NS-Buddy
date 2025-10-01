@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
+import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import '../controllers/app_controller.dart';
 import 'home_view.dart';
 
 class OnboardingView extends StatefulWidget {
-  final AppController appController;
+  final TempViewModel tempViewModel;
 
-  const OnboardingView({super.key, required this.appController});
+  const OnboardingView({super.key, required this.tempViewModel});
 
   @override
   State<OnboardingView> createState() => _OnboardingViewState();
@@ -24,12 +25,13 @@ class _OnboardingViewState extends State<OnboardingView> {
   @override
   void initState() {
     super.initState();
-    final s = widget.appController.settings;
-    _dob = s.dob;
+    // final s = widget.tempViewModel.settings;
+    final userInfo = widget.tempViewModel.userInfo;
+    _dob = userInfo.dob;
     // _gender = s.gender;
-    _isShiongVoc = s.isShiongVoc;
-    _ordDate = s.ordDate;
-    _enlistmentDate = s.enlistmentDate;
+    _isShiongVoc = userInfo.isShiongVoc;
+    _ordDate = userInfo.ordDate;
+    _enlistmentDate = userInfo.enlistmentDate;
   }
 
   Future<void> _pickDate(
@@ -63,16 +65,15 @@ class _OnboardingViewState extends State<OnboardingView> {
       );
       return;
     }
-    final settings = widget.appController.settings;
-    settings.setDob(_dob);
+    widget.tempViewModel.setDob(_dob);
     // settings.setGender(_gender); // disabled
-    settings.setIsShiongVoc(_isShiongVoc);
-    settings.setEnlistmentDate(_enlistmentDate);
-    settings.setOrdDate(_ordDate);
-    settings.setHasCompletedOnboarding(true);
+    widget.tempViewModel.setIsShiongVoc(_isShiongVoc);
+    widget.tempViewModel.setEnlistmentDate(_enlistmentDate);
+    widget.tempViewModel.setOrdDate(_ordDate);
+    widget.tempViewModel.setHasCompletedOnboarding(true);
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) => HomeView(appController: widget.appController),
+        builder: (_) => HomeView(tempViewModel: widget.tempViewModel),
       ),
       (route) => false,
     );

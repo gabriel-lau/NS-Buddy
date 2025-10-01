@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
 import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
 import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
+import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'package:ns_buddy/views/onboarding_view.dart' show OnboardingView;
 import '../controllers/app_controller.dart';
 
 class SettingsView extends StatelessWidget {
-  final AppController appController;
+  final TempViewModel tempViewModel;
 
-  const SettingsView({super.key, required this.appController});
+  const SettingsView({super.key, required this.tempViewModel});
 
   @override
   Widget build(BuildContext context) {
-    final settings = appController.settings;
+    // final settings = appController.settings;
+    final settings = tempViewModel.settings;
+    final userInfo = tempViewModel.userInfo;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,18 +66,18 @@ class SettingsView extends StatelessWidget {
                               ListTile(
                                 title: const Text('Date of Birth'),
                                 subtitle: Text(
-                                  settings.dob != null
-                                      ? '${settings.dob!.day}/${settings.dob!.month}/${settings.dob!.year}'
+                                  userInfo.dob != null
+                                      ? '${userInfo.dob!.day}/${userInfo.dob!.month}/${userInfo.dob!.year}'
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
                                 onTap: () => _selectDate(
                                   context,
-                                  settings.dob,
+                                  userInfo.dob,
                                   DateTime(1900),
                                   Jiffy.now().subtract(years: 16).dateTime,
                                   (date) {
-                                    appController.setDob(date);
+                                    tempViewModel.setDob(date);
                                   },
                                 ),
                               ),
@@ -99,26 +102,26 @@ class SettingsView extends StatelessWidget {
                                 subtitle: const Text(
                                   'Are you in Commando, NDU or Guards?',
                                 ),
-                                value: settings.isShiongVoc,
-                                onChanged: appController.setIsShiongVoc,
+                                value: userInfo.isShiongVoc,
+                                onChanged: tempViewModel.setIsShiongVoc,
                               ),
 
                               // Enlistment Date
                               ListTile(
                                 title: const Text('Enlistment Date'),
                                 subtitle: Text(
-                                  settings.enlistmentDate != null
-                                      ? '${settings.enlistmentDate!.day}/${settings.enlistmentDate!.month}/${settings.enlistmentDate!.year}'
+                                  userInfo.enlistmentDate != null
+                                      ? '${userInfo.enlistmentDate!.day}/${userInfo.enlistmentDate!.month}/${userInfo.enlistmentDate!.year}'
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
                                 onTap: () => _selectDate(
                                   context,
-                                  settings.enlistmentDate,
+                                  userInfo.enlistmentDate,
                                   DateTime(1900),
                                   Jiffy.now().add(years: 5).dateTime,
                                   (date) {
-                                    appController.setEnlistmentDate(date);
+                                    tempViewModel.setEnlistmentDate(date);
                                   },
                                 ),
                               ),
@@ -127,18 +130,18 @@ class SettingsView extends StatelessWidget {
                               ListTile(
                                 title: const Text('ORD Date'),
                                 subtitle: Text(
-                                  settings.ordDate != null
-                                      ? '${settings.ordDate!.day}/${settings.ordDate!.month}/${settings.ordDate!.year}'
+                                  userInfo.ordDate != null
+                                      ? '${userInfo.ordDate!.day}/${userInfo.ordDate!.month}/${userInfo.ordDate!.year}'
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
                                 onTap: () => _selectDate(
                                   context,
-                                  settings.ordDate,
+                                  userInfo.ordDate,
                                   DateTime(1900),
                                   Jiffy.now().add(years: 5).dateTime,
                                   (date) {
-                                    appController.setOrdDate(date);
+                                    tempViewModel.setOrdDate(date);
                                   },
                                 ),
                               ),
@@ -206,7 +209,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Follow System Theme'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setTheme(value);
+                                    tempViewModel.setTheme(value);
                                   }
                                 },
                               ),
@@ -216,7 +219,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Light Theme'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setTheme(value);
+                                    tempViewModel.setTheme(value);
                                   }
                                 },
                               ),
@@ -226,7 +229,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Dark Theme'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setTheme(value);
+                                    tempViewModel.setTheme(value);
                                   }
                                 },
                               ),
@@ -238,7 +241,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('System Accent Color'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setPrimaryColour(value);
+                                    tempViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
@@ -248,7 +251,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Red'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setPrimaryColour(value);
+                                    tempViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
@@ -258,7 +261,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Green'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setPrimaryColour(value);
+                                    tempViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
@@ -268,7 +271,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Blue'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setPrimaryColour(value);
+                                    tempViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
@@ -278,7 +281,7 @@ class SettingsView extends StatelessWidget {
                                 title: const Text('Deep Purple'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    appController.setPrimaryColour(value);
+                                    tempViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
@@ -338,12 +341,12 @@ class SettingsView extends StatelessWidget {
                               // Reset Settings
                               TextButton(
                                 onPressed: () {
-                                  appController.resetSettings();
+                                  tempViewModel.resetSettings();
                                   // Transition to onboarding flow
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                       builder: (context) => OnboardingView(
-                                        appController: appController,
+                                        tempViewModel: tempViewModel,
                                       ),
                                     ),
                                   );
