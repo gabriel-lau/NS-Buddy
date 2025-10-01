@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
-import '../controllers/app_controller.dart';
+import 'package:provider/provider.dart';
 import 'home_view.dart';
 
 class OnboardingView extends StatefulWidget {
-  final TempViewModel tempViewModel;
-
-  const OnboardingView({super.key, required this.tempViewModel});
+  const OnboardingView({super.key});
 
   @override
   State<OnboardingView> createState() => _OnboardingViewState();
@@ -25,8 +23,8 @@ class _OnboardingViewState extends State<OnboardingView> {
   @override
   void initState() {
     super.initState();
-    // final s = widget.tempViewModel.settings;
-    final userInfo = widget.tempViewModel.userInfo;
+    final tempViewModel = Provider.of<TempViewModel>(context, listen: false);
+    final userInfo = tempViewModel.userInfo;
     _dob = userInfo.dob;
     // _gender = s.gender;
     _isShiongVoc = userInfo.isShiongVoc;
@@ -65,16 +63,15 @@ class _OnboardingViewState extends State<OnboardingView> {
       );
       return;
     }
-    widget.tempViewModel.setDob(_dob);
+    final tempViewModel = Provider.of<TempViewModel>(context, listen: false);
+    tempViewModel.setDob(_dob);
     // settings.setGender(_gender); // disabled
-    widget.tempViewModel.setIsShiongVoc(_isShiongVoc);
-    widget.tempViewModel.setEnlistmentDate(_enlistmentDate);
-    widget.tempViewModel.setOrdDate(_ordDate);
-    widget.tempViewModel.setHasCompletedOnboarding(true);
+    tempViewModel.setIsShiongVoc(_isShiongVoc);
+    tempViewModel.setEnlistmentDate(_enlistmentDate);
+    tempViewModel.setOrdDate(_ordDate);
+    tempViewModel.setHasCompletedOnboarding(true);
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => HomeView(tempViewModel: widget.tempViewModel),
-      ),
+      MaterialPageRoute(builder: (_) => HomeView()),
       (route) => false,
     );
   }

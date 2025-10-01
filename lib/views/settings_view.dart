@@ -4,16 +4,14 @@ import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
 import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'package:ns_buddy/views/onboarding_view.dart' show OnboardingView;
-import '../controllers/app_controller.dart';
+import 'package:provider/provider.dart';
 
 class SettingsView extends StatelessWidget {
-  final TempViewModel tempViewModel;
-
-  const SettingsView({super.key, required this.tempViewModel});
+  const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // final settings = appController.settings;
+    final tempViewModel = Provider.of<TempViewModel>(context);
     final settings = tempViewModel.settings;
     final userInfo = tempViewModel.userInfo;
 
@@ -345,9 +343,7 @@ class SettingsView extends StatelessWidget {
                                   // Transition to onboarding flow
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
-                                      builder: (context) => OnboardingView(
-                                        tempViewModel: tempViewModel,
-                                      ),
+                                      builder: (context) => OnboardingView(),
                                     ),
                                   );
                                 },

@@ -4,17 +4,14 @@ import 'package:ns_buddy/data/datasources/shared_preference_data_source.dart';
 import 'package:ns_buddy/data/repositories/settings_repository_impl.dart';
 import 'package:ns_buddy/data/repositories/user_info_repository_impl.dart';
 import 'package:ns_buddy/domain/entities/settings_entity.dart';
-import 'package:ns_buddy/domain/interfaces/settings_repository.dart';
 import 'package:ns_buddy/domain/interfaces/settings_usecases.dart';
-import 'package:ns_buddy/domain/interfaces/user_info_repository.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/domain/usecases/settings_usecases_impl.dart';
 import 'package:ns_buddy/domain/usecases/user_info_usecases_impl.dart';
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
-import 'controllers/app_controller.dart';
-import 'models/app_settings.dart';
 import 'views/home_view.dart';
 import 'views/onboarding_view.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -102,18 +99,21 @@ class _MyAppState extends State<MyApp> {
     //   },
     // );
 
-    return MaterialApp(
-      title: 'NS Buddy',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        brightness: Brightness.light,
+    return ChangeNotifierProvider(
+      create: (_) => tempViewModel,
+      child: MaterialApp(
+        title: 'NS Buddy',
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
+        themeMode: ThemeMode.system,
+        home: HomeView(),
       ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        brightness: Brightness.dark,
-      ),
-      themeMode: ThemeMode.system,
-      home: HomeView(tempViewModel: tempViewModel),
     );
   }
 }

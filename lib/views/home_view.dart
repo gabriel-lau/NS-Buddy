@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:ns_buddy/domain/entities/settings_entity.dart';
 import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert' as convert;
-import '../controllers/app_controller.dart';
-import '../models/app_settings.dart';
 import 'settings_view.dart';
 
 class HomeView extends StatelessWidget {
   // final AppController appController;
-  final TempViewModel tempViewModel;
 
-  const HomeView({super.key, required this.tempViewModel});
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final tempViewModel = Provider.of<TempViewModel>(context);
     return AnimatedBuilder(
       animation: tempViewModel,
       builder: (context, _) {
@@ -32,10 +30,7 @@ class HomeView extends StatelessWidget {
                 IconButton(
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            SettingsView(tempViewModel: tempViewModel),
-                      ),
+                      MaterialPageRoute(builder: (context) => SettingsView()),
                     );
                   },
                   icon: const Icon(Icons.settings),
