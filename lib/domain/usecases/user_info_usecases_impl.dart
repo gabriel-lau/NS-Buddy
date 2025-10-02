@@ -13,9 +13,8 @@ class UserInfoUsecasesImpl extends ChangeNotifier implements UserInfoUsecases {
   UserInfoEntity get userInfoEntity => _currentUserInfo;
 
   @override
-  Future<UserInfoEntity> retrieveUserInfo() async {
+  Future<void> retrieveUserInfo() async {
     _currentUserInfo = await repository.retrieveUserInfo();
-    return _currentUserInfo;
   }
 
   @override

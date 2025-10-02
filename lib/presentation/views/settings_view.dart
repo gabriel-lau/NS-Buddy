@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
+import 'package:ns_buddy/domain/interfaces/settings_usecases.dart';
+import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
 import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
+import 'package:ns_buddy/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'package:ns_buddy/presentation/views/onboarding_view.dart'
     show OnboardingView;
@@ -12,9 +15,23 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tempViewModel = Provider.of<TempViewModel>(context);
-    final settings = tempViewModel.settings;
-    final userInfo = tempViewModel.userInfo;
+    return ChangeNotifierProvider(
+      create: (context) => SettingsViewModel(
+        userInfoUsecases: context.read<UserInfoUsecases>(),
+        settingsUsecases: context.read<SettingsUsecases>(),
+      ),
+      child: _SettingsViewContent(),
+    );
+  }
+}
+
+class _SettingsViewContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // final settingsViewModel = context.read<SettingsViewModel>();
+    final settingsViewModel = Provider.of<SettingsViewModel>(context);
+    // final settings = settingsViewModel.settings;
+    // final userInfo = settingsViewModel.userInfo;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,18 +82,18 @@ class SettingsView extends StatelessWidget {
                               ListTile(
                                 title: const Text('Date of Birth'),
                                 subtitle: Text(
-                                  userInfo.dob != null
-                                      ? '${userInfo.dob!.day}/${userInfo.dob!.month}/${userInfo.dob!.year}'
+                                  settingsViewModel.dob != null
+                                      ? '${settingsViewModel.dob!.day}/${settingsViewModel.dob!.month}/${settingsViewModel.dob!.year}'
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
                                 onTap: () => _selectDate(
                                   context,
-                                  userInfo.dob,
+                                  settingsViewModel.dob,
                                   DateTime(1900),
                                   Jiffy.now().subtract(years: 16).dateTime,
                                   (date) {
-                                    tempViewModel.setDob(date);
+                                    settingsViewModel.setDob(date);
                                   },
                                 ),
                               ),
@@ -101,26 +118,26 @@ class SettingsView extends StatelessWidget {
                                 subtitle: const Text(
                                   'Are you in Commando, NDU or Guards?',
                                 ),
-                                value: userInfo.isShiongVoc,
-                                onChanged: tempViewModel.setIsShiongVoc,
+                                value: settingsViewModel.isShiongVoc!,
+                                onChanged: settingsViewModel.setIsShiongVoc,
                               ),
 
                               // Enlistment Date
                               ListTile(
                                 title: const Text('Enlistment Date'),
                                 subtitle: Text(
-                                  userInfo.enlistmentDate != null
-                                      ? '${userInfo.enlistmentDate!.day}/${userInfo.enlistmentDate!.month}/${userInfo.enlistmentDate!.year}'
+                                  settingsViewModel.enlistmentDate != null
+                                      ? '${settingsViewModel.enlistmentDate!.day}/${settingsViewModel.enlistmentDate!.month}/${settingsViewModel.enlistmentDate!.year}'
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
                                 onTap: () => _selectDate(
                                   context,
-                                  userInfo.enlistmentDate,
+                                  settingsViewModel.enlistmentDate,
                                   DateTime(1900),
                                   Jiffy.now().add(years: 5).dateTime,
                                   (date) {
-                                    tempViewModel.setEnlistmentDate(date);
+                                    settingsViewModel.setEnlistmentDate(date);
                                   },
                                 ),
                               ),
@@ -129,18 +146,18 @@ class SettingsView extends StatelessWidget {
                               ListTile(
                                 title: const Text('ORD Date'),
                                 subtitle: Text(
-                                  userInfo.ordDate != null
-                                      ? '${userInfo.ordDate!.day}/${userInfo.ordDate!.month}/${userInfo.ordDate!.year}'
+                                  settingsViewModel.ordDate != null
+                                      ? '${settingsViewModel.ordDate!.day}/${settingsViewModel.ordDate!.month}/${settingsViewModel.ordDate!.year}'
                                       : 'Not set',
                                 ),
                                 trailing: const Icon(Icons.calendar_today),
                                 onTap: () => _selectDate(
                                   context,
-                                  userInfo.ordDate,
+                                  settingsViewModel.ordDate,
                                   DateTime(1900),
                                   Jiffy.now().add(years: 5).dateTime,
                                   (date) {
-                                    tempViewModel.setOrdDate(date);
+                                    settingsViewModel.setOrdDate(date);
                                   },
                                 ),
                               ),
@@ -204,31 +221,31 @@ class SettingsView extends StatelessWidget {
                               // ),
                               RadioListTile(
                                 value: ThemeOption.system,
-                                groupValue: settings.theme,
+                                groupValue: settingsViewModel.theme,
                                 title: const Text('Follow System Theme'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setTheme(value);
+                                    settingsViewModel.setTheme(value);
                                   }
                                 },
                               ),
                               RadioListTile(
                                 value: ThemeOption.light,
-                                groupValue: settings.theme,
+                                groupValue: settingsViewModel.theme,
                                 title: const Text('Light Theme'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setTheme(value);
+                                    settingsViewModel.setTheme(value);
                                   }
                                 },
                               ),
                               RadioListTile(
                                 value: ThemeOption.dark,
-                                groupValue: settings.theme,
+                                groupValue: settingsViewModel.theme,
                                 title: const Text('Dark Theme'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setTheme(value);
+                                    settingsViewModel.setTheme(value);
                                   }
                                 },
                               ),
@@ -236,51 +253,51 @@ class SettingsView extends StatelessWidget {
                               const SizedBox(height: 16.0),
                               RadioListTile(
                                 value: ColourOption.system,
-                                groupValue: settings.primaryColour,
+                                groupValue: settingsViewModel.primaryColour,
                                 title: const Text('System Accent Color'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setPrimaryColour(value);
+                                    settingsViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
                               RadioListTile(
                                 value: ColourOption.red,
-                                groupValue: settings.primaryColour,
+                                groupValue: settingsViewModel.primaryColour,
                                 title: const Text('Red'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setPrimaryColour(value);
+                                    settingsViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
                               RadioListTile(
                                 value: ColourOption.green,
-                                groupValue: settings.primaryColour,
+                                groupValue: settingsViewModel.primaryColour,
                                 title: const Text('Green'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setPrimaryColour(value);
+                                    settingsViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
                               RadioListTile(
                                 value: ColourOption.blue,
-                                groupValue: settings.primaryColour,
+                                groupValue: settingsViewModel.primaryColour,
                                 title: const Text('Blue'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setPrimaryColour(value);
+                                    settingsViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
                               RadioListTile(
                                 value: ColourOption.deepPurple,
-                                groupValue: settings.primaryColour,
+                                groupValue: settingsViewModel.primaryColour,
                                 title: const Text('Deep Purple'),
                                 onChanged: (value) {
                                   if (value != null) {
-                                    tempViewModel.setPrimaryColour(value);
+                                    settingsViewModel.setPrimaryColour(value);
                                   }
                                 },
                               ),
@@ -340,7 +357,7 @@ class SettingsView extends StatelessWidget {
                               // Reset Settings
                               TextButton(
                                 onPressed: () {
-                                  tempViewModel.resetSettings();
+                                  settingsViewModel.resetSettings();
                                   // Transition to onboarding flow
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(

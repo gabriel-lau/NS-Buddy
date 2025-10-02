@@ -101,6 +101,13 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<SettingsUsecases>(
           create: (_) => settingsUsecases,
         ),
+        // TODO : Remove TempViewModel after refactoring
+        // ChangeNotifierProvider<TempViewModel>(
+        //   create: (context) => TempViewModel(
+        //     settingsUsecases: settingsUsecases,
+        //     userInfoUsecases: userInfoUsecases,
+        //   ),
+        // ),
       ],
       child: MaterialApp(
         title: 'NS Buddy',

@@ -15,14 +15,8 @@ class TempViewModel extends ChangeNotifier {
     required this.userInfoUsecases,
   });
 
-  late SettingsEntity settings;
-  late UserInfoEntity userInfo;
-
-  // Initialize settings from shared preferences
-  Future<void> initializeSettings() async {
-    settings = await settingsUsecases.retrieveSettings();
-    userInfo = await userInfoUsecases.retrieveUserInfo();
-  }
+  SettingsEntity get settings => settingsUsecases.settingsEntity;
+  UserInfoEntity get userInfo => userInfoUsecases.userInfoEntity;
 
   ThemeMode get themeMode => ThemeOption.system == settings.theme
       ? ThemeMode.system
@@ -87,7 +81,6 @@ class TempViewModel extends ChangeNotifier {
         isDarkMode: settings.isDarkMode,
       ),
     );
-    settings = await settingsUsecases.retrieveSettings();
     notifyListeners();
   }
 
@@ -100,7 +93,6 @@ class TempViewModel extends ChangeNotifier {
         isDarkMode: settings.isDarkMode,
       ),
     );
-    settings = await settingsUsecases.retrieveSettings();
     notifyListeners();
   }
 
@@ -113,7 +105,6 @@ class TempViewModel extends ChangeNotifier {
         isDarkMode: settings.isDarkMode,
       ),
     );
-    settings = await settingsUsecases.retrieveSettings();
     notifyListeners();
   }
 
@@ -129,7 +120,6 @@ class TempViewModel extends ChangeNotifier {
         hasCompletedOnboarding: userInfo.hasCompletedOnboarding,
       ),
     );
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 
@@ -144,7 +134,6 @@ class TempViewModel extends ChangeNotifier {
         hasCompletedOnboarding: userInfo.hasCompletedOnboarding,
       ),
     );
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 
@@ -159,7 +148,6 @@ class TempViewModel extends ChangeNotifier {
         hasCompletedOnboarding: userInfo.hasCompletedOnboarding,
       ),
     );
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 
@@ -174,7 +162,6 @@ class TempViewModel extends ChangeNotifier {
         hasCompletedOnboarding: userInfo.hasCompletedOnboarding,
       ),
     );
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 
@@ -189,7 +176,6 @@ class TempViewModel extends ChangeNotifier {
         hasCompletedOnboarding: userInfo.hasCompletedOnboarding,
       ),
     );
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 
@@ -204,15 +190,12 @@ class TempViewModel extends ChangeNotifier {
         hasCompletedOnboarding: value,
       ),
     );
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 
   Future<void> resetSettings() async {
     settingsUsecases.resetSettings();
     userInfoUsecases.resetUserInfo();
-    settings = await settingsUsecases.retrieveSettings();
-    userInfo = await userInfoUsecases.retrieveUserInfo();
     notifyListeners();
   }
 }
