@@ -8,24 +8,24 @@ class SettingsUsecasesImpl extends ChangeNotifier implements SettingsUsecases {
 
   SettingsUsecasesImpl(this.repository);
 
-  late SettingsEntity _currentSettings;
+  @override
+  late SettingsEntity settingsEntity;
 
   @override
-  Future<SettingsEntity> retrieveSettings() async {
-    _currentSettings = await repository.retrieveSettings();
-    return _currentSettings;
+  Future<void> retrieveSettings() async {
+    settingsEntity = await repository.retrieveSettings();
   }
 
   @override
   Future<void> updateSettings(SettingsEntity settings) async {
-    _currentSettings = settings;
+    settingsEntity = settings;
     notifyListeners();
     await repository.updateSettings(settings);
   }
 
   @override
   Future<void> resetSettings() async {
-    _currentSettings = SettingsEntity(); // Reset to default values
+    settingsEntity = SettingsEntity(); // Reset to default values
     notifyListeners();
     await repository.resetSettings();
   }

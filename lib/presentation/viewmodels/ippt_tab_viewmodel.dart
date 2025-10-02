@@ -11,28 +11,23 @@ class IpptTabViewModel extends ChangeNotifier {
   final UserInfoUsecases userInfoUsecases;
 
   UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
+  Map<String, dynamic>? _ipptData;
 
-  double _pushUpValue = 0;
-  double _sitUpValue = 0;
-  double _runValue = 20 * 60;
-
-  Map<String, dynamic>?
-  _ipptData; // Loaded from lib/assets/ippt_score_chart.json
-
-  // Local, non-persisted age state
+  // Local copies of user parameters for IPPT calculation
   late int age = 16;
   final List<int> ageOptions = List<int>.generate(45, (i) => 16 + i); // 16..60
-
-  // Local, non-persisted gender state (disabled for now)
   // late String _genderLocal = 'male';
-
-  // Local, non-persisted Shiong vocation
   late bool isShiongVocLocal = false;
   late bool isNSF = true;
 
   // Tracks if any parameter in the collapsible card was edited by the user
   bool _isEdited = false;
   bool get isEdited => _isEdited;
+
+  // IPPT input values
+  double _pushUpValue = 0;
+  double _sitUpValue = 0;
+  double _runValue = 20 * 60;
 
   void decreaseAge() {
     final minAge = ageOptions.first;
@@ -80,6 +75,7 @@ class IpptTabViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO refactor to repository
   Future<void> loadIpptJson() async {
     try {
       final String jsonStr = await rootBundle.loadString(
