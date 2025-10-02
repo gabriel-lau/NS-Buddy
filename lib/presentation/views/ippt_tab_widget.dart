@@ -1,201 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
-import 'package:ns_buddy/presentation/viewmodels/counter_tab_viewmodel.dart';
 import 'package:ns_buddy/presentation/viewmodels/ippt_tab_viewmodel.dart';
-import 'dart:convert' as convert;
 
-import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'package:provider/provider.dart';
 
-class IPPTTabWidget extends StatefulWidget {
+class IPPTTabWidget extends StatelessWidget {
   const IPPTTabWidget({super.key});
 
   @override
-  State<IPPTTabWidget> createState() => _IPPTTabWidgetState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) {
+        final ipptTabViewModel = IpptTabViewModel(
+          userInfoUsecases: context.read<UserInfoUsecases>(),
+        );
+        ipptTabViewModel.resetParameters();
+        ipptTabViewModel.loadIpptJson();
+        // Reset parameters
+        // load JSON
+        return ipptTabViewModel;
+      },
+      child: _IPPTTabWidgetContent(),
+    );
+  }
 }
 
-class _IPPTTabWidgetState extends State<IPPTTabWidget> {
-  late UserInfoEntity _userInfo;
-  double _pushUpValue = 0;
-  double _sitUpValue = 0;
-  double _runValue = 20 * 60;
-
-  Map<String, dynamic>?
-  _ipptData; // Loaded from lib/assets/ippt_score_chart.json
-
-  // Local, non-persisted age state
-  late int _age = 16;
-  final List<int> _ageOptions = List<int>.generate(45, (i) => 16 + i); // 16..60
-
-  // Local, non-persisted gender state (disabled for now)
-  // late String _genderLocal = 'male';
-
-  // Local, non-persisted Shiong vocation
-  late bool _isShiongVocLocal = false;
-
-  late bool _isNSF = true;
-
-  // Tracks if any parameter in the collapsible card was edited by the user
-  bool _isEdited = false;
-
-  int get _pushPoints {
-    if (_ipptData == null) return 0;
-    final String ageGroup = _getAgeGroup(_age);
-    final int pushUps = _pushUpValue.round().clamp(0, 60);
-    return _pointsForReps('push_up', pushUps, ageGroup);
-  }
-
-  int get _sitPoints {
-    if (_ipptData == null) return 0;
-    final String ageGroup = _getAgeGroup(_age);
-    final int sitUps = _sitUpValue.round().clamp(0, 60);
-    return _pointsForReps('sit_up', sitUps, ageGroup);
-  }
-
-  int get _runPoints {
-    if (_ipptData == null) return 0;
-    final String ageGroup = _getAgeGroup(_age);
-    final int runSeconds = _runValue.round().clamp(8 * 60, 18 * 60 + 30);
-    return _pointsForRun(runSeconds, ageGroup);
-  }
-
-  int get _score => _pushPoints + _sitPoints + _runPoints;
-
-  String get _award {
-    if (_score < 50) return 'fail';
-    if (_score < 60) return 'pass';
-    if (_score < 75 && !_isNSF) return 'pass (incentive)';
-    if (_score < 75 && _isNSF) return 'pass';
-    if (_score < 85 && !_isShiongVocLocal) return 'silver';
-    if (_score < 90 && _isShiongVocLocal) return 'silver';
-    return 'gold';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final IpptTabViewModel ipptTabViewModel = IpptTabViewModel(
-      userInfoUsecases: Provider.of<UserInfoUsecases>(context, listen: false),
-    );
-    _userInfo = ipptTabViewModel.userInfoEntity;
-    _resetParameters();
-    _loadIpptJson();
-  }
-
-  void _resetParameters() {
-    setState(() {
-      _age = _deriveAgeFromDob(_userInfo.dob) ?? 16;
-      // _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
-      _isShiongVocLocal = _userInfo.isShiongVoc;
-      // If DateTime.now() is still between enlistment date and ORD date, assume NSF
-      _isNSF =
-          _userInfo.enlistmentDate != null &&
-          _userInfo.ordDate != null &&
-          DateTime.now().isAfter(_userInfo.enlistmentDate!) &&
-          DateTime.now().isBefore(_userInfo.ordDate!);
-      _isEdited = false;
-    });
-  }
-
-  Future<void> _loadIpptJson() async {
-    try {
-      final String jsonStr = await rootBundle.loadString(
-        'lib/assets/ippt_score_chart.json',
-      );
-      final Map<String, dynamic> data = convert.jsonDecode(jsonStr);
-      setState(() {
-        _ipptData = data;
-      });
-    } catch (e) {
-      // If asset missing or malformed, keep score at 0
-      debugPrint('Failed to load IPPT JSON: $e');
-    }
-  }
-
-  String _getAgeGroup(int age) {
-    if (age < 22) return '<22';
-    if (age <= 24) return '22-24';
-    if (age <= 27) return '25-27';
-    if (age <= 30) return '28-30';
-    if (age <= 33) return '31-33';
-    if (age <= 36) return '34-36';
-    if (age <= 39) return '37-39';
-    if (age <= 42) return '40-42';
-    if (age <= 45) return '43-45';
-    if (age <= 48) return '46-48';
-    if (age <= 51) return '49-51';
-    if (age <= 54) return '52-54';
-    if (age <= 57) return '55-57';
-    return '58-60';
-  }
-
-  int _pointsForReps(String category, int reps, String ageGroup) {
-    final Map<String, dynamic>? scoring =
-        _ipptData?['ippt']?[category]?['scoring'] as Map<String, dynamic>?;
-    if (scoring == null) return 0;
-    final Map<String, dynamic>? row = scoring['$reps'] as Map<String, dynamic>?;
-    if (row == null) return 0;
-    final dynamic value = row[ageGroup];
-    if (value is int) return value;
-    return 0;
-  }
-
-  int _pointsForRun(int runSeconds, String ageGroup) {
-    final Map<String, dynamic>? runTable =
-        _ipptData?['ippt']?['run_2_4km']?['scoring'] as Map<String, dynamic>?;
-    if (runTable == null) return 0;
-
-    int parseTimeToSeconds(String mmss) {
-      final parts = mmss.split(':');
-      if (parts.length != 2) return 0;
-      final int m = int.tryParse(parts[0]) ?? 0;
-      final int s = int.tryParse(parts[1]) ?? 0;
-      return m * 60 + s;
-    }
-
-    // Build sorted list of bucket seconds
-    final List<int> buckets =
-        runTable.keys.map((k) => parseTimeToSeconds(k)).toList()..sort();
-
-    // Choose the smallest bucket that is >= user's time (conservative rounding)
-    int chosen = buckets.last;
-    for (final b in buckets) {
-      if (runSeconds <= b) {
-        chosen = b;
-        break;
-      }
-    }
-
-    String formatSeconds(int secs) {
-      final int m = secs ~/ 60;
-      final int s = secs % 60;
-      final String ss = s.toString().padLeft(2, '0');
-      return '$m:$ss';
-    }
-
-    final Map<String, dynamic>? row =
-        runTable[formatSeconds(chosen)] as Map<String, dynamic>?;
-    if (row == null) return 0;
-    final dynamic value = row[ageGroup];
-    if (value is int) return value;
-    return 0;
-  }
-
-  int? _deriveAgeFromDob(DateTime? dob) {
-    if (dob == null) return null;
-    final now = DateTime.now();
-    int years = now.year - dob.year;
-    final hadBirthdayThisYear =
-        (now.month > dob.month) ||
-        (now.month == dob.month && now.day >= dob.day);
-    if (!hadBirthdayThisYear) years -= 1;
-    return years.clamp(0, 120);
-  }
-
+class _IPPTTabWidgetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final ipptTabViewModel = context.watch<IpptTabViewModel>();
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -248,21 +81,13 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                         Icons.remove_circle_outline,
                                       ),
                                       tooltip: 'Decrease age',
-                                      onPressed: () {
-                                        setState(() {
-                                          final minAge = _ageOptions.first;
-                                          _age = (_age - 1).clamp(
-                                            minAge,
-                                            _ageOptions.last,
-                                          );
-                                          _isEdited = true;
-                                        });
-                                      },
+                                      onPressed: () =>
+                                          ipptTabViewModel.decreaseAge(),
                                     ),
                                     const SizedBox(width: 4),
                                     DropdownButton<int>(
-                                      value: _age,
-                                      items: _ageOptions
+                                      value: ipptTabViewModel.age,
+                                      items: ipptTabViewModel.ageOptions
                                           .map(
                                             (a) => DropdownMenuItem<int>(
                                               value: a,
@@ -272,10 +97,7 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                           .toList(),
                                       onChanged: (val) {
                                         if (val == null) return;
-                                        setState(() {
-                                          _age = val;
-                                          _isEdited = true;
-                                        });
+                                        ipptTabViewModel.setAge(val);
                                       },
                                     ),
                                     const SizedBox(width: 4),
@@ -284,16 +106,8 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                         Icons.add_circle_outline,
                                       ),
                                       tooltip: 'Increase age',
-                                      onPressed: () {
-                                        setState(() {
-                                          final maxAge = _ageOptions.last;
-                                          _age = (_age + 1).clamp(
-                                            _ageOptions.first,
-                                            maxAge,
-                                          );
-                                          _isEdited = true;
-                                        });
-                                      },
+                                      onPressed: () =>
+                                          ipptTabViewModel.increaseAge(),
                                     ),
                                   ],
                                 ),
@@ -350,13 +164,9 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                       ),
                                     ),
                                     Switch(
-                                      value: _isShiongVocLocal,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          _isShiongVocLocal = val;
-                                          _isEdited = true;
-                                        });
-                                      },
+                                      value: ipptTabViewModel.isShiongVocLocal,
+                                      onChanged: (_) =>
+                                          ipptTabViewModel.toggleIsShiongVoc(),
                                     ),
                                   ],
                                 ),
@@ -379,13 +189,9 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                       ),
                                     ),
                                     Switch(
-                                      value: _isNSF,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          _isNSF = val;
-                                          _isEdited = true;
-                                        });
-                                      },
+                                      value: ipptTabViewModel.isNSF,
+                                      onChanged: (_) =>
+                                          ipptTabViewModel.toggleIsNSF(),
                                     ),
                                   ],
                                 ),
@@ -394,7 +200,7 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                 padding: const EdgeInsets.all(16),
                                 child: Row(
                                   children: [
-                                    if (_isEdited)
+                                    if (ipptTabViewModel.isEdited)
                                       Chip(
                                         label: const Text('Edited'),
                                         materialTapTargetSize:
@@ -418,7 +224,8 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                       ),
                                     const Spacer(),
                                     OutlinedButton.icon(
-                                      onPressed: _resetParameters,
+                                      onPressed:
+                                          ipptTabViewModel.resetParameters,
                                       icon: const Icon(Icons.restart_alt),
                                       label: const Text('Reset'),
                                     ),
@@ -458,75 +265,73 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                                 Row(
                                   children: [
                                     Text(
-                                      'Push-ups: ${_pushUpValue.toInt()}',
+                                      'Push-ups: ${ipptTabViewModel.pushUpValue.toInt()}',
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodyLarge,
                                     ),
                                     Spacer(),
-                                    Text('$_pushPoints Points'),
+                                    Text(
+                                      '${ipptTabViewModel.pushPoints} Points',
+                                    ),
                                   ],
                                 ),
                                 Slider(
-                                  value: _pushUpValue,
+                                  value: ipptTabViewModel.pushUpValue,
                                   min: 0,
                                   max: 60,
                                   divisions: 60,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _pushUpValue = value;
-                                    });
-                                  },
+                                  onChanged: (value) =>
+                                      ipptTabViewModel.pushUpValue = value,
                                 ),
                                 const SizedBox(height: 16),
                                 // Sit-up Slider
                                 Row(
                                   children: [
                                     Text(
-                                      'Sit-ups: ${_sitUpValue.toInt()} ',
+                                      'Sit-ups: ${ipptTabViewModel.sitUpValue.toInt()} ',
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodyLarge,
                                     ),
                                     Spacer(),
-                                    Text('$_sitPoints Points'),
+                                    Text(
+                                      '${ipptTabViewModel.sitPoints} Points',
+                                    ),
                                   ],
                                 ),
                                 Slider(
-                                  value: _sitUpValue,
+                                  value: ipptTabViewModel.sitUpValue,
                                   min: 0,
                                   max: 60,
                                   divisions: 60,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _sitUpValue = value;
-                                    });
-                                  },
+                                  onChanged: (value) =>
+                                      ipptTabViewModel.sitUpValue = value,
                                 ),
                                 const SizedBox(height: 16),
                                 // 2.4km Run Slider
                                 Row(
                                   children: [
                                     Text(
-                                      '2.4km: ${(_runValue / 60).toInt()} mins ${(_runValue % 60).toInt()} sec',
+                                      '2.4km: ${(ipptTabViewModel.runValue / 60).toInt()} mins ${(ipptTabViewModel.runValue % 60).toInt()} sec',
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodyLarge,
                                     ),
                                     Spacer(),
-                                    Text('$_runPoints Points'),
+                                    Text(
+                                      '${ipptTabViewModel.runPoints} Points',
+                                    ),
                                   ],
                                 ),
 
                                 Slider(
-                                  value: _runValue,
+                                  value: ipptTabViewModel.runValue,
                                   min: 8 * 60,
                                   max: 20 * 60,
                                   divisions: 72,
                                   onChanged: (value) {
-                                    setState(() {
-                                      _runValue = value;
-                                    });
+                                    ipptTabViewModel.runValue = value;
                                   },
                                 ),
                                 // const SizedBox(
@@ -550,6 +355,7 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
   }
 
   Widget _buildScoreBar(BuildContext context) {
+    final ipptTabViewModel = context.watch<IpptTabViewModel>();
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return SafeArea(
       top: false,
@@ -570,7 +376,7 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
               Row(
                 children: [
                   Text(
-                    '$_score Points',
+                    '${ipptTabViewModel.score} Points',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Spacer(),
@@ -590,8 +396,8 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
-                            semanticsLabel: _score.toString(),
-                            value: _score / 100.0,
+                            semanticsLabel: ipptTabViewModel.score.toString(),
+                            value: ipptTabViewModel.score / 100.0,
                             minHeight: 8,
                             backgroundColor: scheme.surfaceContainerHighest,
                           ),
@@ -611,6 +417,8 @@ class _IPPTTabWidgetState extends State<IPPTTabWidget> {
   }
 
   Widget _buildAwardChip(BuildContext context) {
+    final ipptTabViewModel = context.watch<IpptTabViewModel>();
+    final String _award = ipptTabViewModel.award;
     final ColorScheme scheme = Theme.of(context).colorScheme;
     Color background;
     Color foreground = scheme.onPrimary;

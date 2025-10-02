@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/presentation/viewmodels/counter_tab_viewmodel.dart';
-import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'package:provider/provider.dart';
 
 class CounterTabWidget extends StatelessWidget {
