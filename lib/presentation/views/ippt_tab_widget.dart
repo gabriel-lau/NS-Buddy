@@ -16,8 +16,6 @@ class IPPTTabWidget extends StatelessWidget {
         );
         ipptTabViewModel.resetParameters();
         ipptTabViewModel.loadIpptJson();
-        // Reset parameters
-        // load JSON
         return ipptTabViewModel;
       },
       child: _IPPTTabWidgetContent(),
@@ -334,9 +332,6 @@ class _IPPTTabWidgetContent extends StatelessWidget {
                                     ipptTabViewModel.runValue = value;
                                   },
                                 ),
-                                // const SizedBox(
-                                //   height: 120,
-                                // ), // Spacer so bottom bar does not overlap content
                               ],
                             ),
                           ),
@@ -418,12 +413,11 @@ class _IPPTTabWidgetContent extends StatelessWidget {
 
   Widget _buildAwardChip(BuildContext context) {
     final ipptTabViewModel = context.watch<IpptTabViewModel>();
-    final String _award = ipptTabViewModel.award;
     final ColorScheme scheme = Theme.of(context).colorScheme;
     Color background;
     Color foreground = scheme.onPrimary;
 
-    switch (_award) {
+    switch (ipptTabViewModel.award) {
       case 'gold':
         background = Colors.amber.shade600;
         break;
@@ -445,7 +439,7 @@ class _IPPTTabWidgetContent extends StatelessWidget {
     }
 
     return Chip(
-      label: Text(_award.toUpperCase()),
+      label: Text(ipptTabViewModel.award.toUpperCase()),
       backgroundColor: background,
       labelStyle: Theme.of(
         context,
