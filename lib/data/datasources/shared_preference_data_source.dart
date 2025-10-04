@@ -18,8 +18,6 @@ class SharedPreferenceDataSource {
       );
     } else {
       SettingsModel settingsModel = SettingsModel(
-        useDynamicColors: true,
-        isDarkMode: false,
         theme: ThemeOption.system,
         primaryColour: ColourOption.system,
         disablePersistence: false,

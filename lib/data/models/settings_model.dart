@@ -4,14 +4,10 @@ import 'package:ns_buddy/enums/theme_option.dart';
 
 class SettingsModel extends SettingsEntity {
   SettingsModel({
-    required bool useDynamicColors,
-    required bool isDarkMode,
     required ThemeOption theme,
     required ColourOption primaryColour,
     required bool disablePersistence,
   }) : super(
-         useDynamicColors: useDynamicColors,
-         isDarkMode: isDarkMode,
          theme: theme,
          primaryColour: primaryColour,
          disablePersistence: disablePersistence,
@@ -19,8 +15,6 @@ class SettingsModel extends SettingsEntity {
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) {
     return SettingsModel(
-      useDynamicColors: json['useDynamicColors'] ?? true,
-      isDarkMode: json['isDarkMode'] ?? false,
       theme: ThemeOption.values.firstWhere(
         (e) => e.toString() == 'ThemeOption.${json['theme']}',
         orElse: () => ThemeOption.system,
@@ -34,8 +28,6 @@ class SettingsModel extends SettingsEntity {
   }
   Map<String, dynamic> toJson() {
     return {
-      'useDynamicColors': useDynamicColors,
-      'isDarkMode': isDarkMode,
       'theme': theme.toString().split('.').last,
       'primaryColour': primaryColour.toString().split('.').last,
       'disablePersistence': disablePersistence,
@@ -44,8 +36,6 @@ class SettingsModel extends SettingsEntity {
 
   factory SettingsModel.fromEntity(SettingsEntity entity) {
     return SettingsModel(
-      useDynamicColors: entity.useDynamicColors,
-      isDarkMode: entity.isDarkMode,
       theme: entity.theme,
       primaryColour: entity.primaryColour,
       disablePersistence: entity.disablePersistence,
@@ -53,8 +43,6 @@ class SettingsModel extends SettingsEntity {
   }
 
   SettingsEntity toEntity() => SettingsEntity(
-    useDynamicColors: useDynamicColors,
-    isDarkMode: isDarkMode,
     theme: theme,
     primaryColour: primaryColour,
     disablePersistence: disablePersistence,

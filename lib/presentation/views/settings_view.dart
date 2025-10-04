@@ -27,10 +27,7 @@ class SettingsView extends StatelessWidget {
 class _SettingsViewContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // final settingsViewModel = context.read<SettingsViewModel>();
-    final settingsViewModel = Provider.of<SettingsViewModel>(context);
-    // final settings = settingsViewModel.settings;
-    // final userInfo = settingsViewModel.userInfo;
+    final settingsViewModel = context.watch<SettingsViewModel>();
 
     return Scaffold(
       appBar: AppBar(
@@ -358,6 +355,9 @@ class _SettingsViewContent extends StatelessWidget {
                                 onPressed: () {
                                   settingsViewModel.resetSettings();
                                   // Transition to onboarding flow
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                       builder: (context) => OnboardingView(),

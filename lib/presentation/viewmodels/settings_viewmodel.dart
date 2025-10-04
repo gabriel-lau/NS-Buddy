@@ -84,8 +84,6 @@ class SettingsViewModel extends ChangeNotifier {
       SettingsEntity(
         theme: theme,
         primaryColour: _settingsEntity.primaryColour,
-        useDynamicColors: _settingsEntity.useDynamicColors,
-        isDarkMode: _settingsEntity.isDarkMode,
       ),
     );
     notifyListeners();
@@ -94,12 +92,7 @@ class SettingsViewModel extends ChangeNotifier {
   ColourOption get primaryColour => _settingsEntity.primaryColour;
   Future<void> setPrimaryColour(ColourOption colour) async {
     await settingsUsecases.updateSettings(
-      SettingsEntity(
-        theme: _settingsEntity.theme,
-        primaryColour: colour,
-        useDynamicColors: _settingsEntity.useDynamicColors,
-        isDarkMode: _settingsEntity.isDarkMode,
-      ),
+      SettingsEntity(theme: _settingsEntity.theme, primaryColour: colour),
     );
     notifyListeners();
   }
@@ -109,16 +102,4 @@ class SettingsViewModel extends ChangeNotifier {
     await userInfoUsecases.resetUserInfo();
     notifyListeners();
   }
-
-  // Future<void> updateThemeMode(ThemeMode mode) async {
-  //   await settingsUsecases.updateSettings(
-  //     SettingsEntity(
-  //       themeMode: mode,
-  //       notificationsEnabled: settings.notificationsEnabled,
-  //       fontSize: settings.fontSize,
-  //     ),
-  //   );
-  //   settings = settingsUsecases.settingsEntity;
-  //   notifyListeners();
-  // }
 }
