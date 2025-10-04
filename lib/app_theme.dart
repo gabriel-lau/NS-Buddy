@@ -20,10 +20,10 @@ class AppTheme {
         return Colors.red;
       case ColourOption.green:
         return Colors.green;
-      case ColourOption.blue:
-        return Colors.blue;
+      case ColourOption.deepPurple:
+        return Colors.deepPurple;
       default:
-        return Colors.deepPurple; // Default fallback
+        return Colors.blue; // Default fallback
     }
   }
 

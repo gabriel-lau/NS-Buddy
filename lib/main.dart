@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:ns_buddy/app_theme.dart';
-import 'package:ns_buddy/data/datasources/shared_preference_data_source.dart';
+import 'package:ns_buddy/data/datasources/shared_preference_datasource.dart';
 import 'package:ns_buddy/data/repositories/settings_repository_impl.dart';
 import 'package:ns_buddy/data/repositories/user_info_repository_impl.dart';
 import 'package:ns_buddy/domain/interfaces/settings_usecases.dart';
@@ -57,8 +57,30 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      return DynamicColorBuilder(
+        builder: (light, dark) {
+          return MaterialApp(
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme:
+                  light ??
+                  ColorScheme.fromSeed(
+                    seedColor: Colors.blue,
+                    brightness: Brightness.light,
+                  ),
+            ),
+            darkTheme: ThemeData(
+              useMaterial3: true,
+              colorScheme:
+                  dark ??
+                  ColorScheme.fromSeed(
+                    seedColor: Colors.blue,
+                    brightness: Brightness.dark,
+                  ),
+            ),
+          );
+        },
       );
     }
 
@@ -79,8 +101,22 @@ class _MyAppState extends State<MyApp> {
             builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
               return MaterialApp(
                 title: 'NS Buddy',
-                theme: appTheme.buildLightTheme(dynamicScheme: lightDynamic),
-                darkTheme: appTheme.buildDarkTheme(dynamicScheme: darkDynamic),
+                theme: lightDynamic != null
+                    ? appTheme.buildLightTheme(dynamicScheme: lightDynamic)
+                    : appTheme.buildLightTheme(
+                        dynamicScheme: ColorScheme.fromSeed(
+                          seedColor: appTheme.primarySwatch,
+                          brightness: Brightness.light,
+                        ),
+                      ),
+                darkTheme: darkDynamic != null
+                    ? appTheme.buildDarkTheme(dynamicScheme: darkDynamic)
+                    : appTheme.buildDarkTheme(
+                        dynamicScheme: ColorScheme.fromSeed(
+                          seedColor: appTheme.primarySwatch,
+                          brightness: Brightness.dark,
+                        ),
+                      ),
                 themeMode: appTheme.themeMode,
                 home: userInfoUsecases.userInfoEntity.hasCompletedOnboarding
                     ? HomeView()

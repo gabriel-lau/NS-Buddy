@@ -1,4 +1,4 @@
-import 'package:ns_buddy/data/datasources/shared_preference_data_source.dart';
+import 'package:ns_buddy/data/datasources/shared_preference_datasource.dart';
 import 'package:ns_buddy/data/models/user_info_model.dart';
 import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_repository.dart';
