@@ -3,14 +3,14 @@ import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 
 class CounterTabViewModel extends ChangeNotifier {
-  UserInfoUsecases userInfoUsecases;
+  final UserInfoUsecases userInfoUsecases;
 
   CounterTabViewModel(this.userInfoUsecases);
 
-  UserInfoEntity get userInfoEntity => userInfoUsecases.userInfoEntity;
+  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
 
-  DateTime? get ordDate => userInfoEntity.ordDate;
-  DateTime? get enlistmentDate => userInfoEntity.enlistmentDate;
+  DateTime? get ordDate => _userInfoEntity.ordDate;
+  DateTime? get enlistmentDate => _userInfoEntity.enlistmentDate;
   DateTime get now => DateTime.now();
   DateTime get today => DateTime(now.year, now.month, now.day);
 
@@ -98,5 +98,9 @@ class CounterTabViewModel extends ChangeNotifier {
       current = current.add(const Duration(days: 1));
     }
     return weekendsCount;
+  }
+
+  void updateView() {
+    notifyListeners();
   }
 }

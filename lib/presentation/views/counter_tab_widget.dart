@@ -7,8 +7,10 @@ class CounterTabWidget extends StatelessWidget {
   const CounterTabWidget({super.key});
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CounterTabViewModel(context.read<UserInfoUsecases>()),
+    return ChangeNotifierProxyProvider<UserInfoUsecases, CounterTabViewModel>(
+      create: (context) =>
+          CounterTabViewModel(context.read<UserInfoUsecases>()),
+      update: (context, userInfoUsecases, previous) => previous!..updateView(),
       child: _CounterTabWidgetContent(),
     );
   }

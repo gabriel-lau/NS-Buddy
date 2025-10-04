@@ -9,15 +9,16 @@ class IPPTTabWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProxyProvider<UserInfoUsecases, IpptTabViewModel>(
       create: (context) {
         final ipptTabViewModel = IpptTabViewModel(
-          userInfoUsecases: context.read<UserInfoUsecases>(),
+          context.read<UserInfoUsecases>(),
         );
         ipptTabViewModel.resetParameters();
         ipptTabViewModel.loadIpptJson();
         return ipptTabViewModel;
       },
+      update: (context, userInfoUsecases, previous) => previous!..updateView(),
       child: _IPPTTabWidgetContent(),
     );
   }
@@ -26,7 +27,7 @@ class IPPTTabWidget extends StatelessWidget {
 class _IPPTTabWidgetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final ipptTabViewModel = context.watch<IpptTabViewModel>();
+    final ipptTabViewModel = context.read<IpptTabViewModel>();
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraints) {

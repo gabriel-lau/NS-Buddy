@@ -6,9 +6,9 @@ import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 
 class IpptTabViewModel extends ChangeNotifier {
-  IpptTabViewModel({required this.userInfoUsecases});
-
   final UserInfoUsecases userInfoUsecases;
+
+  IpptTabViewModel(this.userInfoUsecases);
 
   UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
   Map<String, dynamic>? _ipptData;
@@ -218,5 +218,9 @@ class IpptTabViewModel extends ChangeNotifier {
         (now.month == dob.month && now.day >= dob.day);
     if (!hadBirthdayThisYear) years -= 1;
     return years.clamp(0, 120);
+  }
+
+  void updateView() {
+    notifyListeners();
   }
 }
