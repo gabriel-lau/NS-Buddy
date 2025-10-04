@@ -114,7 +114,7 @@ class _SettingsViewContent extends StatelessWidget {
                                 subtitle: const Text(
                                   'Are you in Commando, NDU or Guards?',
                                 ),
-                                value: settingsViewModel.isShiongVoc!,
+                                value: settingsViewModel.isShiongVoc ?? false,
                                 onChanged: settingsViewModel.setIsShiongVoc,
                               ),
 
