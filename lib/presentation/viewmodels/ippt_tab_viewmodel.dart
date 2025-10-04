@@ -136,10 +136,16 @@ class IpptTabViewModel extends ChangeNotifier {
   String get award {
     if (score < 50) return 'fail';
     if (score < 60) return 'pass';
-    if (score < 75 && !isNSF) return 'pass (incentive)';
-    if (score < 75 && isNSF) return 'pass';
-    if (score < 85 && !isShiongVocLocal) return 'silver';
-    if (score < 90 && isShiongVocLocal) return 'silver';
+    // For scores 60-74: Pass with incentive for regulars, just pass for NSF
+    if (score < 75) {
+      return isNSF ? 'pass' : 'pass (incentive)';
+    }
+    // For scores 75-84: Silver (or 75-89 for shiong voc)
+    if (isShiongVocLocal) {
+      if (score < 90) return 'silver';
+    } else {
+      if (score < 85) return 'silver';
+    }
     return 'gold';
   }
 
@@ -220,7 +226,8 @@ class IpptTabViewModel extends ChangeNotifier {
         (now.month > dob.month) ||
         (now.month == dob.month && now.day >= dob.day);
     if (!hadBirthdayThisYear) years -= 1;
-    return years.clamp(0, 120);
+    // Clamp to the same range as ageOptions (16-60)
+    return years.clamp(ageOptions.first, ageOptions.last);
   }
 
   void updateView() {

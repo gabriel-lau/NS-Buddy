@@ -54,16 +54,19 @@ class OnboardingViewModel extends ChangeNotifier {
     userInfoUsecases.updateUserInfo(
       UserInfoEntity(
         dob: _dob,
-        // gender: _gender, // disabled
+        gender: null, // Explicitly set to null when disabled
         isShiongVoc: _isShiongVoc,
         ordDate: _ordDate,
         enlistmentDate: _enlistmentDate,
         hasCompletedOnboarding: true,
       ),
     );
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => HomeView()),
-      (route) => false,
-    );
+    // Check if context is still mounted before navigation
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => HomeView()),
+        (route) => false,
+      );
+    }
   }
 }

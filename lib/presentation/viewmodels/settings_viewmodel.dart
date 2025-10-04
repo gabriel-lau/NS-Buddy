@@ -48,7 +48,7 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime? get ordDate => _userInfoEntity.ordDate;
+  DateTime? get enlistmentDate => _userInfoEntity.enlistmentDate;
   Future<void> setEnlistmentDate(DateTime? value) async {
     await userInfoUsecases.updateUserInfo(
       UserInfoEntity(
@@ -63,7 +63,7 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime? get enlistmentDate => _userInfoEntity.enlistmentDate;
+  DateTime? get ordDate => _userInfoEntity.ordDate;
   Future<void> setOrdDate(DateTime? value) async {
     await userInfoUsecases.updateUserInfo(
       UserInfoEntity(

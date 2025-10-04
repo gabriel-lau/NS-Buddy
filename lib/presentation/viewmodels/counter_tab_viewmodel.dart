@@ -16,7 +16,15 @@ class CounterTabViewModel extends ChangeNotifier {
 
   // Calculate percentage elapsed from enlistment to ORD
   int? get totalDays => ordDate != null && enlistmentDate != null
-      ? ordDate!.difference(enlistmentDate!).inDays
+      ? DateTime(ordDate!.year, ordDate!.month, ordDate!.day)
+            .difference(
+              DateTime(
+                enlistmentDate!.year,
+                enlistmentDate!.month,
+                enlistmentDate!.day,
+              ),
+            )
+            .inDays
       : null;
   int? get elapsedDays => ordDate != null && enlistmentDate != null
       ? today.difference(enlistmentDate!).inDays
@@ -61,8 +69,10 @@ class CounterTabViewModel extends ChangeNotifier {
     if (to == null) return 0;
     int weekdaysCount = 0;
     DateTime current = DateTime(from.year, from.month, from.day);
+    DateTime normalizedTo = DateTime(to.year, to.month, to.day);
 
-    while (current.isBefore(to) || current.isAtSameMomentAs(to)) {
+    while (current.isBefore(normalizedTo) ||
+        current.isAtSameMomentAs(normalizedTo)) {
       // Weekdays are Monday (1) to Friday (5)
       if (current.weekday >= 1 && current.weekday <= 5) {
         weekdaysCount++;
@@ -78,8 +88,10 @@ class CounterTabViewModel extends ChangeNotifier {
     if (to == null) return 0;
     int weekendsCount = 0;
     DateTime current = DateTime(from.year, from.month, from.day);
+    DateTime normalizedTo = DateTime(to.year, to.month, to.day);
 
-    while (current.isBefore(to) || current.isAtSameMomentAs(to)) {
+    while (current.isBefore(normalizedTo) ||
+        current.isAtSameMomentAs(normalizedTo)) {
       // Weekends are Saturday (6) and Sunday (7)
       if (current.weekday == 6 || current.weekday == 7) {
         weekendsCount++;
