@@ -24,9 +24,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // late final AppSettings _settings;
-  // late final AppController _appController;
-
   late final SharedPreferenceDataSource _localDataSource =
       SharedPreferenceDataSource();
   late final SettingsUsecases settingsUsecases; // Assume initialized elsewhere
@@ -36,21 +33,17 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // _settings = AppSettings();
-    // _appController = AppController(settings: _settings);
+    _initializeApp();
+  }
 
+  Future<void> _initializeApp() async {
+    // Load persisted settings
     settingsUsecases = SettingsUsecasesImpl(
       SettingsRepositoryImpl(_localDataSource),
     );
     userInfoUsecases = UserInfoUsecasesImpl(
       UserInfoRepositoryImpl(_localDataSource),
     );
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    // Load persisted settings
-    // await _appController.initializeSettings();
     await settingsUsecases.retrieveSettings();
     await userInfoUsecases.retrieveUserInfo();
 
@@ -68,29 +61,6 @@ class _MyAppState extends State<MyApp> {
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       );
     }
-
-    // return AnimatedBuilder(
-    //   animation: _settings,
-    //   builder: (context, _) {
-    //     return DynamicColorBuilder(
-    //       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-    //         return MaterialApp(
-    //           title: 'NS Buddy',
-    //           theme: _appController.buildLightTheme(
-    //             dynamicScheme: lightDynamic,
-    //           ),
-    //           darkTheme: _appController.buildDarkTheme(
-    //             dynamicScheme: darkDynamic,
-    //           ),
-    //           themeMode: _appController.themeMode,
-    //           home: _settings.hasCompletedOnboarding
-    //               ? HomeView(appController: _appController)
-    //               : OnboardingView(appController: _appController),
-    //         );
-    //       },
-    //     );
-    //   },
-    // );
 
     return MultiProvider(
       providers: [

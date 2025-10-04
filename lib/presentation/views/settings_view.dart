@@ -187,169 +187,96 @@ class _SettingsViewContent extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 16),
-                              // SwitchListTile(
-                              //   title: const Text('Dynamic Colors'),
-                              //   subtitle: Text(
-                              //     settings.useDynamicColors
-                              //         ? 'Using system accent colors'
-                              //         : 'Using static colors',
-                              //   ),
-                              //   value: settings.useDynamicColors,
-                              //   onChanged: appController.setDynamicColors,
-                              // ),
-                              // SwitchListTile(
-                              //   title: const Text('Dark Mode'),
-                              //   subtitle: Text(
-                              //     settings.isDarkMode
-                              //         ? 'Using dark theme'
-                              //         : 'Using light theme',
-                              //   ),
-                              //   value: settings.isDarkMode,
-                              //   onChanged: (value) {
-                              //     appController.setDynamicColors(false);
-                              //     appController.toggleThemeMode();
-                              //   },
-                              //   secondary: Icon(
-                              //     settings.isDarkMode
-                              //         ? Icons.dark_mode
-                              //         : Icons.light_mode,
-                              //   ),
-                              // ),
-                              RadioListTile(
-                                value: ThemeOption.system,
-                                groupValue: settingsViewModel.theme,
-                                title: const Text('Follow System Theme'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setTheme(value);
-                                  }
-                                },
+                              const Text(
+                                'Theme',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              RadioListTile(
-                                value: ThemeOption.light,
-                                groupValue: settingsViewModel.theme,
-                                title: const Text('Light Theme'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setTheme(value);
-                                  }
-                                },
-                              ),
-                              RadioListTile(
-                                value: ThemeOption.dark,
-                                groupValue: settingsViewModel.theme,
-                                title: const Text('Dark Theme'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setTheme(value);
-                                  }
-                                },
+                              const SizedBox(height: 8),
+                              SegmentedButton<ThemeOption>(
+                                segments: const [
+                                  ButtonSegment<ThemeOption>(
+                                    value: ThemeOption.system,
+                                    label: Text('System'),
+                                    icon: Icon(Icons.brightness_auto),
+                                  ),
+                                  ButtonSegment<ThemeOption>(
+                                    value: ThemeOption.light,
+                                    label: Text('Light'),
+                                    icon: Icon(Icons.light_mode),
+                                  ),
+                                  ButtonSegment<ThemeOption>(
+                                    value: ThemeOption.dark,
+                                    label: Text('Dark'),
+                                    icon: Icon(Icons.dark_mode),
+                                  ),
+                                ],
+                                selected: {settingsViewModel.theme},
+                                onSelectionChanged:
+                                    (Set<ThemeOption> selection) {
+                                      settingsViewModel.setTheme(
+                                        selection.first,
+                                      );
+                                    },
                               ),
 
                               const SizedBox(height: 16.0),
-                              RadioListTile(
-                                value: ColourOption.system,
-                                groupValue: settingsViewModel.primaryColour,
-                                title: const Text('System Accent Color'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setPrimaryColour(value);
-                                  }
-                                },
-                              ),
-                              RadioListTile(
-                                value: ColourOption.red,
-                                groupValue: settingsViewModel.primaryColour,
-                                title: const Text('Red'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setPrimaryColour(value);
-                                  }
-                                },
-                              ),
-                              RadioListTile(
-                                value: ColourOption.green,
-                                groupValue: settingsViewModel.primaryColour,
-                                title: const Text('Green'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setPrimaryColour(value);
-                                  }
-                                },
-                              ),
-                              RadioListTile(
-                                value: ColourOption.blue,
-                                groupValue: settingsViewModel.primaryColour,
-                                title: const Text('Blue'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setPrimaryColour(value);
-                                  }
-                                },
-                              ),
-                              RadioListTile(
-                                value: ColourOption.deepPurple,
-                                groupValue: settingsViewModel.primaryColour,
-                                title: const Text('Deep Purple'),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    settingsViewModel.setPrimaryColour(value);
-                                  }
-                                },
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(16.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Primary Colour',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodyLarge,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Container(
-                                                width: 24.0,
-                                                height: 24.0,
-                                                color: Colors.red,
-                                              ),
-                                              SizedBox(width: 8.0),
-                                              Container(
-                                                width: 24.0,
-                                                height: 24.0,
-                                                color: Colors.green,
-                                              ),
-                                              SizedBox(width: 8.0),
-                                              Container(
-                                                width: 24.0,
-                                                height: 24.0,
-                                                color: Colors.blue,
-                                              ),
-                                            ],
-                                          ),
-                                          Text(
-                                            'This is a custom subtitle for a more flexible layout.',
-                                            style: TextStyle(
-                                              fontSize: Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium?.fontSize,
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.onSurfaceVariant,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                              const Text(
+                                'Primary Color',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
+                              const SizedBox(height: 8),
+                              SegmentedButton<ColourOption>(
+                                segments: const [
+                                  ButtonSegment<ColourOption>(
+                                    value: ColourOption.system,
+                                    label: Text('System'),
+                                    icon: Icon(Icons.auto_awesome),
+                                  ),
+                                  ButtonSegment<ColourOption>(
+                                    value: ColourOption.red,
+                                    label: Text('Red'),
+                                    icon: Icon(Icons.circle, color: Colors.red),
+                                  ),
+                                  ButtonSegment<ColourOption>(
+                                    value: ColourOption.green,
+                                    label: Text('Green'),
+                                    icon: Icon(
+                                      Icons.circle,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  ButtonSegment<ColourOption>(
+                                    value: ColourOption.blue,
+                                    label: Text('Blue'),
+                                    icon: Icon(
+                                      Icons.circle,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  ButtonSegment<ColourOption>(
+                                    value: ColourOption.deepPurple,
+                                    label: Text('Purple'),
+                                    icon: Icon(
+                                      Icons.circle,
+                                      color: Colors.deepPurple,
+                                    ),
+                                  ),
+                                ],
+                                selected: {settingsViewModel.primaryColour},
+                                onSelectionChanged:
+                                    (Set<ColourOption> selection) {
+                                      settingsViewModel.setPrimaryColour(
+                                        selection.first,
+                                      );
+                                    },
+                              ),
+                              const SizedBox(height: 16),
                               // Reset Settings
                               TextButton(
                                 onPressed: () {
