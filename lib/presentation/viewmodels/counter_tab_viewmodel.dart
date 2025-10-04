@@ -30,17 +30,6 @@ class CounterTabViewModel extends ChangeNotifier {
         ? (elapsedDays!.clamp(0, totalDays!) / totalDays!)
         : null;
   }
-  // int? elapsedDays;
-  // int? remainingDays;
-  // double? percentElapsed = 0;
-  // if (ordDate != null && enlistmentDate != null) {
-  //   totalDays = ordDate.difference(enlistmentDate).inDays;
-  //   elapsedDays = today.difference(enlistmentDate).inDays;
-  //   remainingDays = ordDate.difference(today).inDays;
-  //   percentElapsed = totalDays > 0
-  //       ? (elapsedDays.clamp(0, totalDays) / totalDays)
-  //       : null;
-  // }
 
   // Helper method to format a date as DD MMM YYYY
   String formatDate(DateTime? date) {
