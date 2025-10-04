@@ -341,8 +341,8 @@ void main() {
         // Act - setting same value
         viewModel.dob = dob;
 
-        // Assert - should still notify (Flutter's ChangeNotifier behavior)
-        expect(notificationCount, 1);
+        // Assert - should NOT notify (ChangeNotifier best practice)
+        expect(notificationCount, 0);
       });
     });
   });
