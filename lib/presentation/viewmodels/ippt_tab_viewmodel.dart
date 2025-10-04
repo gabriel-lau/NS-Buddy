@@ -82,7 +82,7 @@ class IpptTabViewModel extends ChangeNotifier {
   Future<void> loadIpptJson() async {
     try {
       final String jsonStr = await rootBundle.loadString(
-        'lib/assets/ippt_score_chart.json',
+        'lib/assets/ippt_chart.json',
       );
       final Map<String, dynamic> data = convert.jsonDecode(jsonStr);
       _ipptData = data;
