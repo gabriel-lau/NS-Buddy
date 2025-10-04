@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:ns_buddy/app_theme.dart';
 import 'package:ns_buddy/data/datasources/shared_preference_data_source.dart';
 import 'package:ns_buddy/data/repositories/settings_repository_impl.dart';
 import 'package:ns_buddy/data/repositories/user_info_repository_impl.dart';
-import 'package:ns_buddy/domain/entities/settings_entity.dart';
 import 'package:ns_buddy/domain/interfaces/settings_usecases.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/domain/usecases/settings_usecases_impl.dart';
 import 'package:ns_buddy/domain/usecases/user_info_usecases_impl.dart';
-import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'presentation/views/home_view.dart';
 import 'presentation/views/onboarding_view.dart';
 import 'package:provider/provider.dart';
@@ -101,26 +100,25 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider<SettingsUsecases>(
           create: (_) => settingsUsecases,
         ),
-        // TODO : Remove TempViewModel after refactoring
-        // ChangeNotifierProvider<TempViewModel>(
-        //   create: (context) => TempViewModel(
-        //     settingsUsecases: settingsUsecases,
-        //     userInfoUsecases: userInfoUsecases,
-        //   ),
-        // ),
       ],
-      child: MaterialApp(
-        title: 'NS Buddy',
-        theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData(
-          primarySwatch: Colors.deepPurple,
-          brightness: Brightness.dark,
-        ),
-        themeMode: ThemeMode.system,
-        home: HomeView(),
+      child: AnimatedBuilder(
+        animation: settingsUsecases,
+        builder: (context, _) {
+          final appTheme = AppTheme(settingsUsecases);
+          return DynamicColorBuilder(
+            builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+              return MaterialApp(
+                title: 'NS Buddy',
+                theme: appTheme.buildLightTheme(dynamicScheme: lightDynamic),
+                darkTheme: appTheme.buildDarkTheme(dynamicScheme: darkDynamic),
+                themeMode: appTheme.themeMode,
+                home: userInfoUsecases.userInfoEntity.hasCompletedOnboarding
+                    ? HomeView()
+                    : OnboardingView(),
+              );
+            },
+          );
+        },
       ),
     );
   }
