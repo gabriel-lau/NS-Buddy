@@ -5,7 +5,6 @@ import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/enums/colour_option.dart' show ColourOption;
 import 'package:ns_buddy/enums/theme_option.dart' show ThemeOption;
 import 'package:ns_buddy/presentation/viewmodels/settings_viewmodel.dart';
-import 'package:ns_buddy/presentation/viewmodels/temp_view_model.dart';
 import 'package:ns_buddy/presentation/views/onboarding_view.dart'
     show OnboardingView;
 import 'package:provider/provider.dart';

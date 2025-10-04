@@ -8,7 +8,10 @@ import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 class IpptTabViewModel extends ChangeNotifier {
   final UserInfoUsecases userInfoUsecases;
 
-  IpptTabViewModel(this.userInfoUsecases);
+  IpptTabViewModel(this.userInfoUsecases) {
+    resetParameters();
+    loadIpptJson();
+  }
 
   UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
   Map<String, dynamic>? _ipptData;
