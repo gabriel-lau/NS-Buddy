@@ -45,14 +45,8 @@ class SharedPreferenceDataSource {
         Map<String, dynamic>.from(jsonDecode(userInfoJson)),
       );
     }
-    UserInfoModel userInfoModel = UserInfoModel(
-      dob: DateTime.now().subtract(const Duration(days: 365 * 18)),
-      isShiongVoc: false,
-      ordDate: DateTime.now().add(const Duration(days: 365 * 2 + 30)),
-      enlistmentDate: DateTime.now().add(const Duration(days: 30)),
-    );
-    await saveUserInfo(userInfoModel);
-    return userInfoModel;
+    // No user info found; return an empty UserInfoModel.
+    return UserInfoModel();
   }
 
   Future<void> saveUserInfo(UserInfoModel userInfo) async {
