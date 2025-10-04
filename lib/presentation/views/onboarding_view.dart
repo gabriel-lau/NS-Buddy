@@ -1,85 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart' show Jiffy;
-import '../controllers/app_controller.dart';
-import 'home_view.dart';
+import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
+import 'package:ns_buddy/presentation/viewmodels/onboarding_viewmodel.dart';
+import 'package:provider/provider.dart';
 
-class OnboardingView extends StatefulWidget {
-  final AppController appController;
-
-  const OnboardingView({super.key, required this.appController});
-
-  @override
-  State<OnboardingView> createState() => _OnboardingViewState();
-}
-
-class _OnboardingViewState extends State<OnboardingView> {
-  DateTime? _dob;
-  // String? _gender; // temporarily disabled
-  bool _isShiongVoc = false;
-  DateTime? _ordDate;
-  DateTime? _enlistmentDate;
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-    final s = widget.appController.settings;
-    _dob = s.dob;
-    // _gender = s.gender;
-    _isShiongVoc = s.isShiongVoc;
-    _ordDate = s.ordDate;
-    _enlistmentDate = s.enlistmentDate;
-  }
-
-  Future<void> _pickDate(
-    BuildContext context,
-    ValueChanged<DateTime?> setter, {
-    DateTime? initialDate,
-    required DateTime firstDate,
-    required DateTime lastDate,
-  }) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
-    setter(picked);
-  }
-
-  // Gender selection temporarily disabled for future versions
-
-  String _formatDmy(DateTime d) => '${d.day}/${d.month}/${d.year}';
-
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
-    final List<String> missing = [];
-    if (_dob == null) missing.add('Date of Birth');
-    // if (_gender == null) missing.add('Gender'); // disabled
-    if (missing.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please complete: ${missing.join(', ')}')),
-      );
-      return;
-    }
-    final settings = widget.appController.settings;
-    settings.setDob(_dob);
-    // settings.setGender(_gender); // disabled
-    settings.setIsShiongVoc(_isShiongVoc);
-    settings.setEnlistmentDate(_enlistmentDate);
-    settings.setOrdDate(_ordDate);
-    settings.setHasCompletedOnboarding(true);
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => HomeView(appController: widget.appController),
-      ),
-      (route) => false,
-    );
-  }
+class OnboardingView extends StatelessWidget {
+  const OnboardingView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) =>
+          OnboardingViewModel(context.read<UserInfoUsecases>()),
+      child: _OnboardingViewContent(),
+    );
+  }
+}
+
+class _OnboardingViewContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final onboardingViewModel = context.watch<OnboardingViewModel>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
@@ -90,7 +31,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       ),
       body: SafeArea(
         child: Form(
-          key: _formKey,
+          key: onboardingViewModel.formKey,
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
@@ -130,17 +71,17 @@ class _OnboardingViewState extends State<OnboardingView> {
                                 ListTile(
                                   title: const Text('Date of Birth'),
                                   subtitle: Text(
-                                    _dob != null
-                                        ? _formatDmy(_dob!)
+                                    onboardingViewModel.dob != null
+                                        ? _formatDmy(onboardingViewModel.dob!)
                                         : 'Not set',
                                   ),
                                   trailing: const Icon(Icons.calendar_today),
                                   onTap: () => _pickDate(
                                     context,
                                     (date) {
-                                      setState(() => _dob = date);
+                                      onboardingViewModel.dob = date;
                                     },
-                                    initialDate: _dob,
+                                    initialDate: onboardingViewModel.dob,
                                     firstDate: DateTime(1960),
                                     lastDate: Jiffy.now()
                                         .subtract(years: 16)
@@ -167,26 +108,29 @@ class _OnboardingViewState extends State<OnboardingView> {
                                   subtitle: const Text(
                                     'Are you in Commando, NDU or Guards?',
                                   ),
-                                  value: _isShiongVoc,
+                                  value: onboardingViewModel.isShiongVoc,
                                   onChanged: (v) =>
-                                      setState(() => _isShiongVoc = v),
+                                      onboardingViewModel.isShiongVoc = v,
                                 ),
 
                                 // Enlistment Date
                                 ListTile(
                                   title: const Text('Enlistment Date'),
                                   subtitle: Text(
-                                    _enlistmentDate != null
-                                        ? _formatDmy(_enlistmentDate!)
+                                    onboardingViewModel.enlistmentDate != null
+                                        ? _formatDmy(
+                                            onboardingViewModel.enlistmentDate!,
+                                          )
                                         : 'Not set',
                                   ),
                                   trailing: const Icon(Icons.calendar_today),
                                   onTap: () => _pickDate(
                                     context,
                                     (date) {
-                                      setState(() => _enlistmentDate = date);
+                                      onboardingViewModel.enlistmentDate = date;
                                     },
-                                    initialDate: _enlistmentDate,
+                                    initialDate:
+                                        onboardingViewModel.enlistmentDate,
                                     firstDate: DateTime(1960),
                                     lastDate: Jiffy.now()
                                         .add(years: 5)
@@ -198,17 +142,19 @@ class _OnboardingViewState extends State<OnboardingView> {
                                 ListTile(
                                   title: const Text('ORD Date'),
                                   subtitle: Text(
-                                    _ordDate != null
-                                        ? _formatDmy(_ordDate!)
+                                    onboardingViewModel.ordDate != null
+                                        ? _formatDmy(
+                                            onboardingViewModel.ordDate!,
+                                          )
                                         : 'Not set',
                                   ),
                                   trailing: const Icon(Icons.calendar_today),
                                   onTap: () => _pickDate(
                                     context,
                                     (date) {
-                                      setState(() => _ordDate = date);
+                                      onboardingViewModel.ordDate = date;
                                     },
-                                    initialDate: _ordDate,
+                                    initialDate: onboardingViewModel.ordDate,
                                     firstDate: DateTime(1960),
                                     lastDate: Jiffy.now()
                                         .add(years: 5)
@@ -224,7 +170,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                         SizedBox(
                           width: double.infinity,
                           child: FilledButton(
-                            onPressed: _submit,
+                            onPressed: () =>
+                                onboardingViewModel.submit(context),
                             child: const Text('Continue'),
                           ),
                         ),
@@ -239,4 +186,24 @@ class _OnboardingViewState extends State<OnboardingView> {
       ),
     );
   }
+
+  Future<void> _pickDate(
+    BuildContext context,
+    ValueChanged<DateTime?> setter, {
+    DateTime? initialDate,
+    required DateTime firstDate,
+    required DateTime lastDate,
+  }) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+    setter(picked);
+  }
+
+  // Gender selection temporarily disabled for future versions
+
+  String _formatDmy(DateTime d) => '${d.day}/${d.month}/${d.year}';
 }
