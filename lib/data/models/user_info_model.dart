@@ -2,20 +2,13 @@ import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 
 class UserInfoModel extends UserInfoEntity {
   UserInfoModel({
-    DateTime? dob,
-    String? gender,
-    bool isShiongVoc = false,
-    DateTime? ordDate,
-    DateTime? enlistmentDate,
-    bool hasCompletedOnboarding = false,
-  }) : super(
-         dob: dob,
-         gender: gender,
-         isShiongVoc: isShiongVoc,
-         ordDate: ordDate,
-         enlistmentDate: enlistmentDate,
-         hasCompletedOnboarding: hasCompletedOnboarding,
-       );
+    super.dob,
+    super.gender,
+    super.isShiongVoc,
+    super.ordDate,
+    super.enlistmentDate,
+    super.hasCompletedOnboarding,
+  });
 
   factory UserInfoModel.fromJson(Map<String, dynamic> json) {
     return UserInfoModel(
@@ -59,4 +52,15 @@ class UserInfoModel extends UserInfoEntity {
     enlistmentDate: enlistmentDate,
     hasCompletedOnboarding: hasCompletedOnboarding,
   );
+
+  // Default constructor with default values
+  UserInfoModel.defaultInfo()
+    : super(
+        dob: null,
+        gender: null,
+        isShiongVoc: false,
+        ordDate: null,
+        enlistmentDate: null,
+        hasCompletedOnboarding: false,
+      );
 }
