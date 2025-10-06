@@ -14,9 +14,9 @@ class UserInfoRepositoryImpl implements UserInfoRepository {
       return await _localDataSource.loadUserInfo();
     } catch (e) {
       await _localDataSource.saveUserInfo(
-        UserInfoModel.defaultInfo(), // Save default user info
+        UserInfoModel(), // Save default user info
       );
-      return UserInfoModel.defaultInfo(); // Return default user info
+      return UserInfoModel(); // Return default user info
     }
   }
 

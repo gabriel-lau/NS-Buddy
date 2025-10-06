@@ -14,19 +14,15 @@ class SettingsRepositoryImpl implements SettingsRepository {
       return await _localDataSource.loadSettings();
     } catch (e) {
       await _localDataSource.saveSettings(
-        SettingsModel.defaultSettings(),
+        SettingsModel(),
       ); // Save default settings
-      return SettingsModel.defaultSettings(); // Return default settings
+      return SettingsModel(); // Return default settings
     }
   }
 
   @override
   Future<void> updateSettings(SettingsEntity settings) async {
     try {
-      // Validate settings before saving
-      if (settings.theme == null || settings.primaryColour == null) {
-        throw Exception('Invalid settings data');
-      }
       await _localDataSource.saveSettings(SettingsModel.fromEntity(settings));
     } catch (e) {
       rethrow;

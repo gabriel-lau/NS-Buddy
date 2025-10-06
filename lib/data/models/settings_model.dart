@@ -3,11 +3,7 @@ import 'package:ns_buddy/enums/colour_option.dart';
 import 'package:ns_buddy/enums/theme_option.dart';
 
 class SettingsModel extends SettingsEntity {
-  SettingsModel({
-    required super.theme,
-    required super.primaryColour,
-    required super.disablePersistence,
-  });
+  SettingsModel({super.theme, super.primaryColour, super.disablePersistence});
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) {
     return SettingsModel(
@@ -43,12 +39,4 @@ class SettingsModel extends SettingsEntity {
     primaryColour: primaryColour,
     disablePersistence: disablePersistence,
   );
-
-  // Default constructor with default values
-  SettingsModel.defaultSettings()
-    : super(
-        theme: ThemeOption.system,
-        primaryColour: ColourOption.blue,
-        disablePersistence: false,
-      );
 }

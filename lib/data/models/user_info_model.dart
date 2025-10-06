@@ -52,15 +52,4 @@ class UserInfoModel extends UserInfoEntity {
     enlistmentDate: enlistmentDate,
     hasCompletedOnboarding: hasCompletedOnboarding,
   );
-
-  // Default constructor with default values
-  UserInfoModel.defaultInfo()
-    : super(
-        dob: null,
-        gender: null,
-        isShiongVoc: false,
-        ordDate: null,
-        enlistmentDate: null,
-        hasCompletedOnboarding: false,
-      );
 }
