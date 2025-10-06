@@ -12,7 +12,7 @@ class FakeUserInfoRepository implements UserInfoRepository {
   @override
   Future<UserInfoEntity> retrieveUserInfo() async {
     if (shouldThrow) throw Exception(errorMessage ?? 'Test error');
-    return _storedUserInfo ?? UserInfoEntity();
+    return _storedUserInfo ?? UserInfoEntity(dob: DateTime(2000, 1, 1));
   }
 
   @override
@@ -24,7 +24,7 @@ class FakeUserInfoRepository implements UserInfoRepository {
   @override
   Future<void> resetUserInfo() async {
     if (shouldThrow) throw Exception(errorMessage ?? 'Test error');
-    _storedUserInfo = UserInfoEntity();
+    _storedUserInfo = UserInfoEntity(dob: DateTime(2000, 1, 1));
   }
 
   void setStoredUserInfo(UserInfoEntity userInfo) {
@@ -126,7 +126,10 @@ void main() {
 
       test('should handle repository update errors', () async {
         // Arrange
-        final userInfo = UserInfoEntity(gender: 'Male');
+        final userInfo = UserInfoEntity(
+          dob: DateTime(2000, 1, 1),
+          gender: 'Male',
+        );
         fakeRepository.shouldThrow = true;
         fakeRepository.errorMessage = 'Update failed';
 
@@ -140,6 +143,7 @@ void main() {
       test('should update local state even if repository fails', () async {
         // Arrange
         final userInfo = UserInfoEntity(
+          dob: DateTime(1995, 5, 15),
           gender: 'Other',
           hasCompletedOnboarding: true,
         );
@@ -190,15 +194,7 @@ void main() {
           await userInfoUsecases.resetUserInfo();
 
           // Assert
-          expect(userInfoUsecases.userInfoEntity!.dob, isNull);
-          expect(userInfoUsecases.userInfoEntity!.gender, isNull);
-          expect(userInfoUsecases.userInfoEntity!.isShiongVoc, false);
-          expect(userInfoUsecases.userInfoEntity!.ordDate, isNull);
-          expect(userInfoUsecases.userInfoEntity!.enlistmentDate, isNull);
-          expect(
-            userInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
-            false,
-          );
+          expect(userInfoUsecases.userInfoEntity, isNull);
           expect(notificationReceived, true);
         },
       );
@@ -216,8 +212,14 @@ void main() {
     group('ChangeNotifier behavior', () {
       test('should notify listeners on updateUserInfo', () async {
         // Arrange
-        final userInfo1 = UserInfoEntity(gender: 'Male');
-        final userInfo2 = UserInfoEntity(gender: 'Female');
+        final userInfo1 = UserInfoEntity(
+          dob: DateTime(2000, 1, 1),
+          gender: 'Male',
+        );
+        final userInfo2 = UserInfoEntity(
+          dob: DateTime(2000, 1, 1),
+          gender: 'Female',
+        );
 
         int notificationCount = 0;
         userInfoUsecases.addListener(() {
@@ -248,7 +250,10 @@ void main() {
 
       test('should not notify listeners on retrieveUserInfo', () async {
         // Arrange
-        final userInfo = UserInfoEntity(gender: 'Male');
+        final userInfo = UserInfoEntity(
+          dob: DateTime(2000, 1, 1),
+          gender: 'Male',
+        );
         fakeRepository.setStoredUserInfo(userInfo);
 
         int notificationCount = 0;

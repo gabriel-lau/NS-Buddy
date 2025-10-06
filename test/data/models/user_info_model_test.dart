@@ -4,17 +4,17 @@ import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 
 void main() {
   group('UserInfoModel', () {
-    final testDob = DateTime(2000, 1, 1);
-    final testOrdDate = DateTime(2023, 12, 31);
-    final testEnlistmentDate = DateTime(2022, 1, 1);
+    final testDob = DateTime(2000, 1, 1).toUtc();
+    final testOrdDate = DateTime(2023, 12, 31).toUtc();
+    final testEnlistmentDate = DateTime(2022, 1, 1).toUtc();
 
     group('Constructor', () {
       test('should create UserInfoModel with default values', () {
         // Act
-        final model = UserInfoModel();
+        final model = UserInfoModel(dob: testDob);
 
         // Assert
-        expect(model.dob, isNull);
+        expect(model.dob, testDob);
         expect(model.gender, isNull);
         expect(model.isShiongVoc, false);
         expect(model.ordDate, isNull);
@@ -69,13 +69,13 @@ void main() {
 
       test('should create UserInfoModel from minimal JSON', () {
         // Arrange
-        final json = <String, dynamic>{};
+        final json = <String, dynamic>{"dob": testDob.toIso8601String()};
 
         // Act
         final model = UserInfoModel.fromJson(json);
 
         // Assert
-        expect(model.dob, isNull);
+        expect(model.dob, testDob);
         expect(model.gender, isNull);
         expect(model.isShiongVoc, false);
         expect(model.ordDate, isNull);
@@ -86,7 +86,7 @@ void main() {
       test('should handle null date strings in JSON', () {
         // Arrange
         final json = {
-          'dob': null,
+          'dob': testDob.toIso8601String(),
           'gender': 'Male',
           'isShiongVoc': false,
           'ordDate': null,
@@ -98,7 +98,7 @@ void main() {
         final model = UserInfoModel.fromJson(json);
 
         // Assert
-        expect(model.dob, isNull);
+        expect(model.dob, testDob);
         expect(model.gender, 'Male');
         expect(model.isShiongVoc, false);
         expect(model.ordDate, isNull);
@@ -109,6 +109,7 @@ void main() {
       test('should handle partial JSON with missing fields', () {
         // Arrange
         final json = {
+          'dob': testDob.toIso8601String(),
           'gender': 'Other',
           'ordDate': testOrdDate.toIso8601String(),
         };
@@ -117,7 +118,7 @@ void main() {
         final model = UserInfoModel.fromJson(json);
 
         // Assert
-        expect(model.dob, isNull);
+        expect(model.dob, testDob);
         expect(model.gender, 'Other');
         expect(model.isShiongVoc, false);
         expect(model.ordDate, testOrdDate);
@@ -142,23 +143,26 @@ void main() {
         final json = model.toJson();
 
         // Assert
-        expect(json['dob'], testDob.toIso8601String());
+        expect(json['dob'], testDob.toUtc().toIso8601String());
         expect(json['gender'], 'Male');
         expect(json['isShiongVoc'], true);
-        expect(json['ordDate'], testOrdDate.toIso8601String());
-        expect(json['enlistmentDate'], testEnlistmentDate.toIso8601String());
+        expect(json['ordDate'], testOrdDate.toUtc().toIso8601String());
+        expect(
+          json['enlistmentDate'],
+          testEnlistmentDate.toUtc().toIso8601String(),
+        );
         expect(json['hasCompletedOnboarding'], true);
       });
 
       test('should convert UserInfoModel with null values to JSON', () {
         // Arrange
-        final model = UserInfoModel();
+        final model = UserInfoModel(dob: DateTime(2000, 1, 1));
 
         // Act
         final json = model.toJson();
 
         // Assert
-        expect(json['dob'], isNull);
+        expect(json['dob'], isNotNull);
         expect(json['gender'], isNull);
         expect(json['isShiongVoc'], false);
         expect(json['ordDate'], isNull);
@@ -171,11 +175,11 @@ void main() {
       test('should create UserInfoModel from UserInfoEntity', () {
         // Arrange
         final entity = UserInfoEntity(
-          dob: testDob,
+          dob: testDob.toLocal(),
           gender: 'Female',
           isShiongVoc: true,
-          ordDate: testOrdDate,
-          enlistmentDate: testEnlistmentDate,
+          ordDate: testOrdDate.toLocal(),
+          enlistmentDate: testEnlistmentDate.toLocal(),
           hasCompletedOnboarding: true,
         );
 
@@ -183,23 +187,23 @@ void main() {
         final model = UserInfoModel.fromEntity(entity);
 
         // Assert
-        expect(model.dob, entity.dob);
+        expect(model.dob, entity.dob.toUtc());
         expect(model.gender, entity.gender);
         expect(model.isShiongVoc, entity.isShiongVoc);
-        expect(model.ordDate, entity.ordDate);
-        expect(model.enlistmentDate, entity.enlistmentDate);
+        expect(model.ordDate, entity.ordDate?.toUtc());
+        expect(model.enlistmentDate, entity.enlistmentDate?.toUtc());
         expect(model.hasCompletedOnboarding, entity.hasCompletedOnboarding);
       });
 
       test('should create UserInfoModel from empty UserInfoEntity', () {
         // Arrange
-        final entity = UserInfoEntity();
+        final entity = UserInfoEntity(dob: testDob.toLocal());
 
         // Act
         final model = UserInfoModel.fromEntity(entity);
 
         // Assert
-        expect(model.dob, isNull);
+        expect(model.dob, testDob.toUtc());
         expect(model.gender, isNull);
         expect(model.isShiongVoc, false);
         expect(model.ordDate, isNull);
@@ -224,11 +228,11 @@ void main() {
         final entity = model.toEntity();
 
         // Assert
-        expect(entity.dob, model.dob);
+        expect(entity.dob, model.dob.toLocal());
         expect(entity.gender, model.gender);
         expect(entity.isShiongVoc, model.isShiongVoc);
-        expect(entity.ordDate, model.ordDate);
-        expect(entity.enlistmentDate, model.enlistmentDate);
+        expect(entity.ordDate, model.ordDate?.toLocal());
+        expect(entity.enlistmentDate, model.enlistmentDate?.toLocal());
         expect(entity.hasCompletedOnboarding, model.hasCompletedOnboarding);
         expect(entity, isA<UserInfoEntity>());
         expect(entity, isNot(isA<UserInfoModel>()));

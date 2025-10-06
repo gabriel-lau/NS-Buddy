@@ -37,10 +37,10 @@ class FakeSettingsUsecases extends SettingsUsecases {
 }
 
 class FakeUserInfoUsecases extends UserInfoUsecases {
-  UserInfoEntity _userInfoEntity = UserInfoEntity();
+  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: DateTime(2000, 1, 1));
 
   @override
-  UserInfoEntity get userInfoEntity => _userInfoEntity;
+  UserInfoEntity? get userInfoEntity => _userInfoEntity;
 
   void setUserInfo(UserInfoEntity userInfo) {
     _userInfoEntity = userInfo;
@@ -59,7 +59,7 @@ class FakeUserInfoUsecases extends UserInfoUsecases {
 
   @override
   Future<void> resetUserInfo() async {
-    _userInfoEntity = UserInfoEntity();
+    _userInfoEntity = null;
     notifyListeners();
   }
 }
@@ -80,17 +80,6 @@ void main() {
     });
 
     group('date of birth', () {
-      test('should return null when user has no DOB', () {
-        // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(dob: null));
-
-        // Act
-        final result = viewModel.dob;
-
-        // Assert
-        expect(result, isNull);
-      });
-
       test('should return DOB when user has DOB', () {
         // Arrange
         final dob = DateTime(1995, 6, 15);
@@ -107,6 +96,7 @@ void main() {
         // Arrange
         final newDob = DateTime(1996, 8, 20);
         final originalUserInfo = UserInfoEntity(
+          dob: DateTime(2000, 1, 1),
           gender: 'male',
           isShiongVoc: true,
           ordDate: DateTime(2025, 1, 1),
@@ -124,25 +114,25 @@ void main() {
         await viewModel.setDob(newDob);
 
         // Assert
-        expect(fakeUserInfoUsecases.userInfoEntity.dob, newDob);
+        expect(fakeUserInfoUsecases.userInfoEntity!.dob, newDob);
         expect(
-          fakeUserInfoUsecases.userInfoEntity.gender,
+          fakeUserInfoUsecases.userInfoEntity!.gender,
           originalUserInfo.gender,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.isShiongVoc,
+          fakeUserInfoUsecases.userInfoEntity!.isShiongVoc,
           originalUserInfo.isShiongVoc,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.ordDate,
+          fakeUserInfoUsecases.userInfoEntity!.ordDate,
           originalUserInfo.ordDate,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.enlistmentDate,
+          fakeUserInfoUsecases.userInfoEntity!.enlistmentDate,
           originalUserInfo.enlistmentDate,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          fakeUserInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           originalUserInfo.hasCompletedOnboarding,
         );
         expect(listenerCalled, true);
@@ -153,7 +143,7 @@ void main() {
       test('should return false when user has default isShiongVoc value', () {
         // Arrange
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(),
+          UserInfoEntity(dob: DateTime(2000, 1, 1)),
         ); // Default isShiongVoc is false
 
         // Act
@@ -165,7 +155,9 @@ void main() {
 
       test('should return isShiongVoc when user has value', () {
         // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(isShiongVoc: true));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), isShiongVoc: true),
+        );
 
         // Act
         final result = viewModel.isShiongVoc;
@@ -195,22 +187,22 @@ void main() {
         await viewModel.setIsShiongVoc(true);
 
         // Assert
-        expect(fakeUserInfoUsecases.userInfoEntity.isShiongVoc, true);
-        expect(fakeUserInfoUsecases.userInfoEntity.dob, originalUserInfo.dob);
+        expect(fakeUserInfoUsecases.userInfoEntity!.isShiongVoc, true);
+        expect(fakeUserInfoUsecases.userInfoEntity!.dob, originalUserInfo.dob);
         expect(
-          fakeUserInfoUsecases.userInfoEntity.gender,
+          fakeUserInfoUsecases.userInfoEntity!.gender,
           originalUserInfo.gender,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.ordDate,
+          fakeUserInfoUsecases.userInfoEntity!.ordDate,
           originalUserInfo.ordDate,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.enlistmentDate,
+          fakeUserInfoUsecases.userInfoEntity!.enlistmentDate,
           originalUserInfo.enlistmentDate,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          fakeUserInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           originalUserInfo.hasCompletedOnboarding,
         );
         expect(listenerCalled, true);
@@ -220,7 +212,9 @@ void main() {
     group('enlistment date', () {
       test('should return null when user has no enlistment date', () {
         // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(enlistmentDate: null));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), enlistmentDate: null),
+        );
 
         // Act
         final result = viewModel.enlistmentDate;
@@ -233,7 +227,10 @@ void main() {
         // Arrange
         final enlistmentDate = DateTime(2023, 3, 15);
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: enlistmentDate),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: enlistmentDate,
+          ),
         );
 
         // Act
@@ -266,24 +263,24 @@ void main() {
 
         // Assert
         expect(
-          fakeUserInfoUsecases.userInfoEntity.enlistmentDate,
+          fakeUserInfoUsecases.userInfoEntity!.enlistmentDate,
           newEnlistmentDate,
         );
-        expect(fakeUserInfoUsecases.userInfoEntity.dob, originalUserInfo.dob);
+        expect(fakeUserInfoUsecases.userInfoEntity!.dob, originalUserInfo.dob);
         expect(
-          fakeUserInfoUsecases.userInfoEntity.gender,
+          fakeUserInfoUsecases.userInfoEntity!.gender,
           originalUserInfo.gender,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.isShiongVoc,
+          fakeUserInfoUsecases.userInfoEntity!.isShiongVoc,
           originalUserInfo.isShiongVoc,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.ordDate,
+          fakeUserInfoUsecases.userInfoEntity!.ordDate,
           originalUserInfo.ordDate,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          fakeUserInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           originalUserInfo.hasCompletedOnboarding,
         );
         expect(listenerCalled, true);
@@ -293,7 +290,9 @@ void main() {
     group('ORD date', () {
       test('should return null when user has no ORD date', () {
         // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(ordDate: null));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), ordDate: null),
+        );
 
         // Act
         final result = viewModel.ordDate;
@@ -305,7 +304,9 @@ void main() {
       test('should return ORD date when user has value', () {
         // Arrange
         final ordDate = DateTime(2025, 3, 15);
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(ordDate: ordDate));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), ordDate: ordDate),
+        );
 
         // Act
         final result = viewModel.ordDate;
@@ -336,22 +337,22 @@ void main() {
         await viewModel.setOrdDate(newOrdDate);
 
         // Assert
-        expect(fakeUserInfoUsecases.userInfoEntity.ordDate, newOrdDate);
-        expect(fakeUserInfoUsecases.userInfoEntity.dob, originalUserInfo.dob);
+        expect(fakeUserInfoUsecases.userInfoEntity!.ordDate, newOrdDate);
+        expect(fakeUserInfoUsecases.userInfoEntity!.dob, originalUserInfo.dob);
         expect(
-          fakeUserInfoUsecases.userInfoEntity.gender,
+          fakeUserInfoUsecases.userInfoEntity!.gender,
           originalUserInfo.gender,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.isShiongVoc,
+          fakeUserInfoUsecases.userInfoEntity!.isShiongVoc,
           originalUserInfo.isShiongVoc,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.enlistmentDate,
+          fakeUserInfoUsecases.userInfoEntity!.enlistmentDate,
           originalUserInfo.enlistmentDate,
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          fakeUserInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           originalUserInfo.hasCompletedOnboarding,
         );
         expect(listenerCalled, true);
@@ -497,18 +498,7 @@ void main() {
           fakeSettingsUsecases.settingsEntity.primaryColour,
           ColourOption.blue,
         );
-        expect(fakeUserInfoUsecases.userInfoEntity.dob, isNull);
-        expect(fakeUserInfoUsecases.userInfoEntity.gender, isNull);
-        expect(
-          fakeUserInfoUsecases.userInfoEntity.isShiongVoc,
-          false,
-        ); // Default value
-        expect(fakeUserInfoUsecases.userInfoEntity.ordDate, isNull);
-        expect(fakeUserInfoUsecases.userInfoEntity.enlistmentDate, isNull);
-        expect(
-          fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
-          false,
-        ); // Default value
+        expect(fakeUserInfoUsecases.userInfoEntity, isNull);
         expect(listenerCalled, true);
       });
     });
@@ -530,19 +520,19 @@ void main() {
         await viewModel.setDob(DateTime(1996, 5, 10));
 
         // Assert
-        expect(fakeUserInfoUsecases.userInfoEntity.dob, DateTime(1996, 5, 10));
-        expect(fakeUserInfoUsecases.userInfoEntity.gender, 'female');
-        expect(fakeUserInfoUsecases.userInfoEntity.isShiongVoc, false);
+        expect(fakeUserInfoUsecases.userInfoEntity!.dob, DateTime(1996, 5, 10));
+        expect(fakeUserInfoUsecases.userInfoEntity!.gender, 'female');
+        expect(fakeUserInfoUsecases.userInfoEntity!.isShiongVoc, false);
         expect(
-          fakeUserInfoUsecases.userInfoEntity.ordDate,
+          fakeUserInfoUsecases.userInfoEntity!.ordDate,
           DateTime(2024, 12, 31),
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.enlistmentDate,
+          fakeUserInfoUsecases.userInfoEntity!.enlistmentDate,
           DateTime(2022, 6, 15),
         );
         expect(
-          fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          fakeUserInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           false,
         );
       });
@@ -565,19 +555,22 @@ void main() {
           await viewModel.setIsShiongVoc(true);
 
           // Assert
-          expect(fakeUserInfoUsecases.userInfoEntity.dob, DateTime(1995, 1, 1));
-          expect(fakeUserInfoUsecases.userInfoEntity.gender, 'female');
-          expect(fakeUserInfoUsecases.userInfoEntity.isShiongVoc, true);
           expect(
-            fakeUserInfoUsecases.userInfoEntity.ordDate,
+            fakeUserInfoUsecases.userInfoEntity!.dob,
+            DateTime(1995, 1, 1),
+          );
+          expect(fakeUserInfoUsecases.userInfoEntity!.gender, 'female');
+          expect(fakeUserInfoUsecases.userInfoEntity!.isShiongVoc, true);
+          expect(
+            fakeUserInfoUsecases.userInfoEntity!.ordDate,
             DateTime(2024, 12, 31),
           );
           expect(
-            fakeUserInfoUsecases.userInfoEntity.enlistmentDate,
+            fakeUserInfoUsecases.userInfoEntity!.enlistmentDate,
             DateTime(2022, 6, 15),
           );
           expect(
-            fakeUserInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+            fakeUserInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
             false,
           );
         },

@@ -27,7 +27,7 @@ class UserInfoUsecasesImpl extends ChangeNotifier implements UserInfoUsecases {
 
   @override
   Future<void> resetUserInfo() async {
-    _currentUserInfo = UserInfoEntity(); // Reset to default values
+    _currentUserInfo = null; // Reset to default values
     notifyListeners();
     await repository.resetUserInfo();
   }

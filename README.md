@@ -19,9 +19,9 @@
 - [ ] Push notifications
   - [ ] Cycle reminders
 - [ ] Widgets
-
   - [ ] Days counter - Home screen widget
   - [ ] Days counter - Lock screen widget (Android 14)
+- [ ] Gender-specific calculations
 
 - [ ] Google Ads integration (AdMob)
 - [ ] In-app purchases (IAP)

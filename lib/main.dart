@@ -120,7 +120,10 @@ class _MyAppState extends State<MyApp> {
                 themeMode: appTheme.themeMode,
                 home:
                     userInfoUsecases.userInfoEntity != null &&
-                        userInfoUsecases.userInfoEntity!.hasCompletedOnboarding
+                        userInfoUsecases
+                                .userInfoEntity
+                                ?.hasCompletedOnboarding ==
+                            true
                     ? HomeView()
                     : OnboardingView(),
               );

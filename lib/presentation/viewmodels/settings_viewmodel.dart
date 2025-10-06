@@ -22,7 +22,7 @@ class SettingsViewModel extends ChangeNotifier {
   Future<void> setDob(DateTime? value) async {
     await userInfoUsecases.updateUserInfo(
       UserInfoEntity(
-        dob: value,
+        dob: value!,
         gender: _userInfoEntity.gender,
         isShiongVoc: _userInfoEntity.isShiongVoc,
         ordDate: _userInfoEntity.ordDate,

@@ -6,10 +6,10 @@ import 'package:ns_buddy/presentation/viewmodels/onboarding_viewmodel.dart';
 
 // Fake implementation for testing
 class FakeUserInfoUsecases extends UserInfoUsecases {
-  UserInfoEntity _userInfoEntity = UserInfoEntity();
+  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: DateTime(2000, 1, 1));
 
   @override
-  UserInfoEntity get userInfoEntity => _userInfoEntity;
+  UserInfoEntity? get userInfoEntity => _userInfoEntity;
 
   void setUserInfo(UserInfoEntity userInfo) {
     _userInfoEntity = userInfo;
@@ -27,7 +27,7 @@ class FakeUserInfoUsecases extends UserInfoUsecases {
 
   @override
   Future<void> resetUserInfo() async {
-    _userInfoEntity = UserInfoEntity();
+    _userInfoEntity = null;
   }
 }
 
@@ -66,22 +66,6 @@ void main() {
 
         // Assert
         expect(viewModel.dob, testDob);
-        expect(listenerCalled, true);
-      });
-
-      test('should handle null dob', () {
-        // Arrange
-        viewModel.dob = DateTime(1995, 6, 15);
-        bool listenerCalled = false;
-        viewModel.addListener(() {
-          listenerCalled = true;
-        });
-
-        // Act
-        viewModel.dob = null;
-
-        // Assert
-        expect(viewModel.dob, isNull);
         expect(listenerCalled, true);
       });
     });
@@ -206,7 +190,7 @@ void main() {
         // Simulate the submit logic without navigation
         fakeUserInfoUsecases.updateUserInfo(
           UserInfoEntity(
-            dob: viewModel.dob,
+            dob: viewModel.dob!,
             isShiongVoc: viewModel.isShiongVoc,
             ordDate: viewModel.ordDate,
             enlistmentDate: viewModel.enlistmentDate,
@@ -216,7 +200,7 @@ void main() {
 
         // Assert
         final updatedUserInfo = fakeUserInfoUsecases.userInfoEntity;
-        expect(updatedUserInfo.dob, DateTime(1995, 6, 15));
+        expect(updatedUserInfo!.dob, DateTime(1995, 6, 15));
         expect(updatedUserInfo.isShiongVoc, true);
         expect(updatedUserInfo.ordDate, DateTime(2025, 12, 31));
         expect(updatedUserInfo.enlistmentDate, DateTime(2023, 1, 15));
@@ -231,7 +215,7 @@ void main() {
         // Simulate the submit logic
         fakeUserInfoUsecases.updateUserInfo(
           UserInfoEntity(
-            dob: viewModel.dob,
+            dob: viewModel.dob!,
             isShiongVoc: viewModel.isShiongVoc,
             ordDate: viewModel.ordDate,
             enlistmentDate: viewModel.enlistmentDate,
@@ -241,7 +225,7 @@ void main() {
 
         // Assert
         final updatedUserInfo = fakeUserInfoUsecases.userInfoEntity;
-        expect(updatedUserInfo.dob, DateTime(1995, 6, 15));
+        expect(updatedUserInfo!.dob, DateTime(1995, 6, 15));
         expect(updatedUserInfo.isShiongVoc, false); // Default value
         expect(updatedUserInfo.ordDate, isNull);
         expect(updatedUserInfo.enlistmentDate, isNull);

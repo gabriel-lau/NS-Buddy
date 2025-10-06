@@ -53,7 +53,7 @@ class OnboardingViewModel extends ChangeNotifier {
     }
     userInfoUsecases.updateUserInfo(
       UserInfoEntity(
-        dob: _dob,
+        dob: _dob!,
         gender: null, // Explicitly set to null when disabled
         isShiongVoc: _isShiongVoc,
         ordDate: _ordDate,

@@ -1,6 +1,6 @@
 class UserInfoEntity {
   // User information fields
-  DateTime? dob;
+  DateTime dob;
   String? gender;
   bool isShiongVoc;
   DateTime? ordDate;
@@ -8,7 +8,7 @@ class UserInfoEntity {
   bool hasCompletedOnboarding;
 
   UserInfoEntity({
-    this.dob,
+    required this.dob,
     this.gender,
     this.isShiongVoc = false,
     this.ordDate,
