@@ -13,7 +13,7 @@ class SettingsEntity {
     this.useDynamicColors = true,
     this.isDarkMode = false,
     this.theme = ThemeOption.system,
-    this.primaryColour = ColourOption.system,
+    this.primaryColour = ColourOption.blue,
     this.disablePersistence = false,
   });
 }

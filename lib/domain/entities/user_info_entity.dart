@@ -2,10 +2,10 @@ class UserInfoEntity {
   // User information fields
   DateTime? dob;
   String? gender;
-  bool isShiongVoc = false;
+  bool isShiongVoc;
   DateTime? ordDate;
   DateTime? enlistmentDate;
-  bool hasCompletedOnboarding = false;
+  bool hasCompletedOnboarding;
 
   UserInfoEntity({
     this.dob,

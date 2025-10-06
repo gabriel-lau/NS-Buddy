@@ -1,8 +1,10 @@
 #### Release V1.0.0
 
-- [ ] Fix primary color button group
+- [x] Fix primary color button group
 - [x] App icon
-- [ ] Splash screen
+- [x] Splash screen
+- [ ] Remove `models/app_settings.dart`
+- [ ] Resolve TODOs
 - [ ] Release to playstore
 
 #### Release V1.1.0

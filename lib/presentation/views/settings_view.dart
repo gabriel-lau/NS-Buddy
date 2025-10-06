@@ -195,31 +195,71 @@ class _SettingsViewContent extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              SegmentedButton<ThemeOption>(
-                                segments: const [
-                                  ButtonSegment<ThemeOption>(
-                                    value: ThemeOption.system,
-                                    label: Text('System'),
-                                    icon: Icon(Icons.brightness_auto),
+                              Wrap(
+                                spacing: 8.0,
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.brightness_auto, size: 16),
+                                        SizedBox(width: 4),
+                                        Text('System'),
+                                      ],
+                                    ),
+                                    selected:
+                                        settingsViewModel.theme ==
+                                        ThemeOption.system,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setTheme(
+                                          ThemeOption.system,
+                                        );
+                                      }
+                                    },
                                   ),
-                                  ButtonSegment<ThemeOption>(
-                                    value: ThemeOption.light,
-                                    label: Text('Light'),
-                                    icon: Icon(Icons.light_mode),
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.light_mode, size: 16),
+                                        SizedBox(width: 4),
+                                        Text('Light'),
+                                      ],
+                                    ),
+                                    selected:
+                                        settingsViewModel.theme ==
+                                        ThemeOption.light,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setTheme(
+                                          ThemeOption.light,
+                                        );
+                                      }
+                                    },
                                   ),
-                                  ButtonSegment<ThemeOption>(
-                                    value: ThemeOption.dark,
-                                    label: Text('Dark'),
-                                    icon: Icon(Icons.dark_mode),
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.dark_mode, size: 16),
+                                        SizedBox(width: 4),
+                                        Text('Dark'),
+                                      ],
+                                    ),
+                                    selected:
+                                        settingsViewModel.theme ==
+                                        ThemeOption.dark,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setTheme(
+                                          ThemeOption.dark,
+                                        );
+                                      }
+                                    },
                                   ),
                                 ],
-                                selected: {settingsViewModel.theme},
-                                onSelectionChanged:
-                                    (Set<ThemeOption> selection) {
-                                      settingsViewModel.setTheme(
-                                        selection.first,
-                                      );
-                                    },
                               ),
 
                               const SizedBox(height: 16.0),
@@ -231,50 +271,128 @@ class _SettingsViewContent extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              SegmentedButton<ColourOption>(
-                                segments: const [
-                                  ButtonSegment<ColourOption>(
-                                    value: ColourOption.system,
-                                    label: Text('System'),
-                                    icon: Icon(Icons.auto_awesome),
-                                  ),
-                                  ButtonSegment<ColourOption>(
-                                    value: ColourOption.red,
-                                    label: Text('Red'),
-                                    icon: Icon(Icons.circle, color: Colors.red),
-                                  ),
-                                  ButtonSegment<ColourOption>(
-                                    value: ColourOption.green,
-                                    label: Text('Green'),
-                                    icon: Icon(
-                                      Icons.circle,
-                                      color: Colors.green,
+                              Wrap(
+                                spacing: 8.0,
+                                runSpacing: 8.0,
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.auto_awesome, size: 16),
+                                        SizedBox(width: 4),
+                                        Text('System'),
+                                      ],
                                     ),
+                                    selected:
+                                        settingsViewModel.primaryColour ==
+                                        ColourOption.system,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setPrimaryColour(
+                                          ColourOption.system,
+                                        );
+                                      }
+                                    },
                                   ),
-                                  ButtonSegment<ColourOption>(
-                                    value: ColourOption.blue,
-                                    label: Text('Blue'),
-                                    icon: Icon(
-                                      Icons.circle,
-                                      color: Colors.blue,
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          color: Colors.red,
+                                          size: 16,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text('Red'),
+                                      ],
                                     ),
+                                    selected:
+                                        settingsViewModel.primaryColour ==
+                                        ColourOption.red,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setPrimaryColour(
+                                          ColourOption.red,
+                                        );
+                                      }
+                                    },
                                   ),
-                                  ButtonSegment<ColourOption>(
-                                    value: ColourOption.deepPurple,
-                                    label: Text('Purple'),
-                                    icon: Icon(
-                                      Icons.circle,
-                                      color: Colors.deepPurple,
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          color: Colors.green,
+                                          size: 16,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text('Green'),
+                                      ],
                                     ),
+                                    selected:
+                                        settingsViewModel.primaryColour ==
+                                        ColourOption.green,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setPrimaryColour(
+                                          ColourOption.green,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          color: Colors.blue,
+                                          size: 16,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text('Blue'),
+                                      ],
+                                    ),
+                                    selected:
+                                        settingsViewModel.primaryColour ==
+                                        ColourOption.blue,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setPrimaryColour(
+                                          ColourOption.blue,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  ChoiceChip(
+                                    label: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          color: Colors.deepPurple,
+                                          size: 16,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text('Purple'),
+                                      ],
+                                    ),
+                                    selected:
+                                        settingsViewModel.primaryColour ==
+                                        ColourOption.deepPurple,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        settingsViewModel.setPrimaryColour(
+                                          ColourOption.deepPurple,
+                                        );
+                                      }
+                                    },
                                   ),
                                 ],
-                                selected: {settingsViewModel.primaryColour},
-                                onSelectionChanged:
-                                    (Set<ColourOption> selection) {
-                                      settingsViewModel.setPrimaryColour(
-                                        selection.first,
-                                      );
-                                    },
                               ),
                               const SizedBox(height: 16),
                               // Reset Settings
