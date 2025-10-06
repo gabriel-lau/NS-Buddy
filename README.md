@@ -1,7 +1,7 @@
 #### Release V1.0.0
 
 - [ ] Fix primary color button group
-- [ ] App icon
+- [x] App icon
 - [ ] Splash screen
 - [ ] Release to playstore
 
