@@ -3,23 +3,25 @@
 - [x] Fix primary color button group
 - [x] App icon
 - [x] Splash screen
+- [ ] Error handling
 - [ ] Remove `models/app_settings.dart`
 - [ ] Resolve TODOs
+- [ ] Screenshots
 - [ ] Release to playstore
 
-#### Release V1.1.0
+#### Backlog
 
 - [ ] Animations
   - [ ] Research built-in material, animate, lottie, flare, flutter_animate, rive
 - [ ] Analytics (Firebase)
 - [ ] Crash reporting (Firebase)
 
-#### Release V1.2.0
-
 - [ ] Push notifications
+  - [ ] Cycle reminders
 - [ ] Widgets
 
-#### Backlog
+  - [ ] Days counter - Home screen widget
+  - [ ] Days counter - Lock screen widget (Android 14)
 
 - [ ] Google Ads integration (AdMob)
 - [ ] In-app purchases (IAP)

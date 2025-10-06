@@ -418,7 +418,7 @@ void main() {
         final result = viewModel.primaryColour;
 
         // Assert
-        expect(result, ColourOption.system); // Default colour
+        expect(result, ColourOption.blue); // Default colour
       });
 
       test('should return colour when colour is set', () {
@@ -495,7 +495,7 @@ void main() {
         expect(fakeSettingsUsecases.settingsEntity.theme, ThemeOption.system);
         expect(
           fakeSettingsUsecases.settingsEntity.primaryColour,
-          ColourOption.system,
+          ColourOption.blue,
         );
         expect(fakeUserInfoUsecases.userInfoEntity.dob, isNull);
         expect(fakeUserInfoUsecases.userInfoEntity.gender, isNull);

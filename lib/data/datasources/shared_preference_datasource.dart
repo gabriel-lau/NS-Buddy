@@ -47,7 +47,7 @@ class SharedPreferenceDataSource {
     }
   }
 
-  Future<UserInfoModel> loadUserInfo() async {
+  Future<UserInfoModel?> loadUserInfo() async {
     try {
       final prefs = await _getSharedPreferencesInstance();
       final userInfoJson = prefs.getString('userInfo');
@@ -56,7 +56,7 @@ class SharedPreferenceDataSource {
           Map<String, dynamic>.from(jsonDecode(userInfoJson)),
         );
       }
-      throw Exception('No user info found');
+      return null;
     } catch (e) {
       rethrow;
     }

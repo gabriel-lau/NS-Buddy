@@ -13,7 +13,7 @@ class IpptTabViewModel extends ChangeNotifier {
     loadIpptJson();
   }
 
-  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
+  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity!;
   Map<String, dynamic>? _ipptData;
 
   // Local copies of user parameters for IPPT calculation

@@ -9,14 +9,11 @@ class UserInfoRepositoryImpl implements UserInfoRepository {
   UserInfoRepositoryImpl(this._localDataSource);
 
   @override
-  Future<UserInfoEntity> retrieveUserInfo() async {
+  Future<UserInfoEntity?> retrieveUserInfo() async {
     try {
       return await _localDataSource.loadUserInfo();
     } catch (e) {
-      await _localDataSource.saveUserInfo(
-        UserInfoModel(), // Save default user info
-      );
-      return UserInfoModel(); // Return default user info
+      rethrow;
     }
   }
 

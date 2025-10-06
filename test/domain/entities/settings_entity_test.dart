@@ -13,7 +13,7 @@ void main() {
       expect(settings.useDynamicColors, true);
       expect(settings.isDarkMode, false);
       expect(settings.theme, ThemeOption.system);
-      expect(settings.primaryColour, ColourOption.system);
+      expect(settings.primaryColour, ColourOption.blue);
       expect(settings.disablePersistence, false);
     });
 

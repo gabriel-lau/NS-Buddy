@@ -15,7 +15,7 @@ class SettingsViewModel extends ChangeNotifier {
     required this.userInfoUsecases,
   });
 
-  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
+  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity!;
   SettingsEntity get _settingsEntity => settingsUsecases.settingsEntity;
 
   DateTime? get dob => _userInfoEntity.dob;

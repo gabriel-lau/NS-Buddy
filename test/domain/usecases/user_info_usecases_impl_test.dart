@@ -67,14 +67,17 @@ void main() {
         await userInfoUsecases.retrieveUserInfo();
 
         // Assert
-        expect(userInfoUsecases.userInfoEntity.dob, expectedUserInfo.dob);
-        expect(userInfoUsecases.userInfoEntity.gender, expectedUserInfo.gender);
+        expect(userInfoUsecases.userInfoEntity!.dob, expectedUserInfo.dob);
         expect(
-          userInfoUsecases.userInfoEntity.isShiongVoc,
+          userInfoUsecases.userInfoEntity!.gender,
+          expectedUserInfo.gender,
+        );
+        expect(
+          userInfoUsecases.userInfoEntity!.isShiongVoc,
           expectedUserInfo.isShiongVoc,
         );
         expect(
-          userInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          userInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           expectedUserInfo.hasCompletedOnboarding,
         );
       });
@@ -108,14 +111,14 @@ void main() {
         await userInfoUsecases.updateUserInfo(userInfo);
 
         // Assert
-        expect(userInfoUsecases.userInfoEntity.dob, userInfo.dob);
-        expect(userInfoUsecases.userInfoEntity.gender, userInfo.gender);
+        expect(userInfoUsecases.userInfoEntity!.dob, userInfo.dob);
+        expect(userInfoUsecases.userInfoEntity!.gender, userInfo.gender);
         expect(
-          userInfoUsecases.userInfoEntity.isShiongVoc,
+          userInfoUsecases.userInfoEntity!.isShiongVoc,
           userInfo.isShiongVoc,
         );
         expect(
-          userInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          userInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           userInfo.hasCompletedOnboarding,
         );
         expect(notificationReceived, true);
@@ -155,9 +158,9 @@ void main() {
         );
 
         // Local state should still be updated
-        expect(userInfoUsecases.userInfoEntity.gender, userInfo.gender);
+        expect(userInfoUsecases.userInfoEntity!.gender, userInfo.gender);
         expect(
-          userInfoUsecases.userInfoEntity.hasCompletedOnboarding,
+          userInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
           userInfo.hasCompletedOnboarding,
         );
         expect(notificationReceived, true);
@@ -187,12 +190,15 @@ void main() {
           await userInfoUsecases.resetUserInfo();
 
           // Assert
-          expect(userInfoUsecases.userInfoEntity.dob, isNull);
-          expect(userInfoUsecases.userInfoEntity.gender, isNull);
-          expect(userInfoUsecases.userInfoEntity.isShiongVoc, false);
-          expect(userInfoUsecases.userInfoEntity.ordDate, isNull);
-          expect(userInfoUsecases.userInfoEntity.enlistmentDate, isNull);
-          expect(userInfoUsecases.userInfoEntity.hasCompletedOnboarding, false);
+          expect(userInfoUsecases.userInfoEntity!.dob, isNull);
+          expect(userInfoUsecases.userInfoEntity!.gender, isNull);
+          expect(userInfoUsecases.userInfoEntity!.isShiongVoc, false);
+          expect(userInfoUsecases.userInfoEntity!.ordDate, isNull);
+          expect(userInfoUsecases.userInfoEntity!.enlistmentDate, isNull);
+          expect(
+            userInfoUsecases.userInfoEntity!.hasCompletedOnboarding,
+            false,
+          );
           expect(notificationReceived, true);
         },
       );
@@ -272,7 +278,7 @@ void main() {
         final result = userInfoUsecases.userInfoEntity;
 
         // Assert
-        expect(result.dob, expectedUserInfo.dob);
+        expect(result!.dob, expectedUserInfo.dob);
         expect(result.gender, expectedUserInfo.gender);
       });
     });
