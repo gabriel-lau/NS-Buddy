@@ -1,0 +1,28 @@
+name: Jules Spec Review
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  inspect-spec:
+    if: github.event.label.name == 'spec-review'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Run Jules Spec Inspection
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          context: |
+            Issue Title: ${{ github.event.issue.title }}
+            Issue Body:
+            ${{ github.event.issue.body }}
+          prompt: |
+            Analyze this issue against the codebase as a Specification Agent.
+            Address all Scope, Non-Goals, and Open Questions.
+            Do not push code commits. Return an architectural spec report.
