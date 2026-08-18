@@ -5,7 +5,9 @@ import 'package:ns_buddy/presentation/viewmodels/ippt_tab_viewmodel.dart';
 
 // Fake implementation for testing
 class FakeUserInfoUsecases extends UserInfoUsecases {
-  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: DateTime(2000, 1, 1));
+  UserInfoEntity? _userInfoEntity = UserInfoEntity(
+    dob: DateTime(DateTime.now().year - 25, 1, 1),
+  );
 
   @override
   UserInfoEntity? get userInfoEntity => _userInfoEntity;
@@ -209,7 +211,8 @@ void main() {
     group('resetParameters', () {
       test('should reset parameters from user entity', () {
         // Arrange
-        final dob = DateTime(2000, 1, 1); // Age ~23
+        final now = DateTime.now();
+        final dob = DateTime(now.year - 25, 1, 1);
         final enlistmentDate = DateTime(2023, 1, 1);
         final ordDate = DateTime(2025, 1, 1);
         fakeUserInfoUsecases.setUserInfo(
@@ -230,7 +233,7 @@ void main() {
         viewModel.resetParameters();
 
         // Assert
-        expect(viewModel.age, greaterThanOrEqualTo(23));
+        expect(viewModel.age, 25);
         expect(viewModel.isShiongVocLocal, true);
         expect(viewModel.isEdited, false);
       });
@@ -310,15 +313,15 @@ void main() {
     group('date of birth age derivation', () {
       test('should derive age correctly from DOB', () {
         // Arrange
-        final dob = DateTime(2000, 1, 1); // Should be ~24-25 years old
+        final now = DateTime.now();
+        final dob = DateTime(now.year - 24, now.month, now.day);
         fakeUserInfoUsecases.setUserInfo(UserInfoEntity(dob: dob));
 
         // Act
         viewModel.resetParameters();
 
         // Assert
-        expect(viewModel.age, greaterThanOrEqualTo(23));
-        expect(viewModel.age, lessThanOrEqualTo(25));
+        expect(viewModel.age, 24);
       });
 
       test('should handle birthday calculation correctly', () {
@@ -367,7 +370,7 @@ void main() {
         final ordDate = now.add(const Duration(days: 365));
         fakeUserInfoUsecases.setUserInfo(
           UserInfoEntity(
-            dob: DateTime(2000, 1, 1),
+            dob: DateTime(now.year - 20, 1, 1),
             enlistmentDate: enlistmentDate,
             ordDate: ordDate,
           ),
@@ -382,9 +385,10 @@ void main() {
 
       test('should handle missing service dates', () {
         // Arrange
+        final now = DateTime.now();
         fakeUserInfoUsecases.setUserInfo(
           UserInfoEntity(
-            dob: DateTime(2000, 1, 1),
+            dob: DateTime(now.year - 20, 1, 1),
             enlistmentDate: null,
             ordDate: null,
           ),
