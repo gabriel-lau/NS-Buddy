@@ -13,7 +13,7 @@ class IpptTabViewModel extends ChangeNotifier {
     loadIpptJson();
   }
 
-  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
+  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity!;
   Map<String, dynamic>? _ipptData;
 
   // Local copies of user parameters for IPPT calculation
@@ -65,7 +65,7 @@ class IpptTabViewModel extends ChangeNotifier {
   }
 
   void resetParameters() {
-    age = _deriveAgeFromDob(_userInfoEntity.dob) ?? 16;
+    age = _deriveAgeFromDob(_userInfoEntity.dob);
     // _genderLocal = (widget.settings.gender == 'female') ? 'female' : 'male';
     isShiongVocLocal = _userInfoEntity.isShiongVoc;
     // If DateTime.now() is still between enlistment date and ORD date, assume NSF
@@ -82,7 +82,7 @@ class IpptTabViewModel extends ChangeNotifier {
   Future<void> loadIpptJson() async {
     try {
       final String jsonStr = await rootBundle.loadString(
-        'lib/assets/ippt_chart.json',
+        'assets/ippt_chart.json',
       );
       final Map<String, dynamic> data = convert.jsonDecode(jsonStr);
       _ipptData = data;
@@ -218,8 +218,7 @@ class IpptTabViewModel extends ChangeNotifier {
     return 0;
   }
 
-  int? _deriveAgeFromDob(DateTime? dob) {
-    if (dob == null) return null;
+  int _deriveAgeFromDob(DateTime dob) {
     final now = DateTime.now();
     int years = now.year - dob.year;
     final hadBirthdayThisYear =

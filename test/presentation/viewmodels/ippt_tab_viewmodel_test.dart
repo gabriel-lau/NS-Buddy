@@ -3,12 +3,17 @@ import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/presentation/viewmodels/ippt_tab_viewmodel.dart';
 
+DateTime _dobForAge(int age) {
+  final now = DateTime.now();
+  return DateTime(now.year - age, now.month, now.day);
+}
+
 // Fake implementation for testing
 class FakeUserInfoUsecases extends UserInfoUsecases {
-  UserInfoEntity _userInfoEntity = UserInfoEntity();
+  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: _dobForAge(25));
 
   @override
-  UserInfoEntity get userInfoEntity => _userInfoEntity;
+  UserInfoEntity? get userInfoEntity => _userInfoEntity;
 
   void setUserInfo(UserInfoEntity userInfo) {
     _userInfoEntity = userInfo;
@@ -26,7 +31,7 @@ class FakeUserInfoUsecases extends UserInfoUsecases {
 
   @override
   Future<void> resetUserInfo() async {
-    _userInfoEntity = UserInfoEntity();
+    _userInfoEntity = null;
   }
 }
 
@@ -45,7 +50,7 @@ void main() {
     group('initialization', () {
       test('should initialize with default values', () {
         // Assert
-        expect(viewModel.age, 16);
+        expect(viewModel.age, 25);
         expect(viewModel.isShiongVocLocal, false);
         expect(viewModel.isNSF, false); // Default after reset
         expect(viewModel.isEdited, false);
@@ -234,18 +239,6 @@ void main() {
         expect(viewModel.isShiongVocLocal, true);
         expect(viewModel.isEdited, false);
       });
-
-      test('should handle null DOB gracefully', () {
-        // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(dob: null));
-
-        // Act
-        viewModel.resetParameters();
-
-        // Assert
-        expect(viewModel.age, 16); // Default age
-        expect(viewModel.isEdited, false);
-      });
     });
 
     group('scoring without IPPT data', () {
@@ -322,15 +315,14 @@ void main() {
     group('date of birth age derivation', () {
       test('should derive age correctly from DOB', () {
         // Arrange
-        final dob = DateTime(2000, 1, 1); // Should be ~24-25 years old
+        final dob = _dobForAge(25);
         fakeUserInfoUsecases.setUserInfo(UserInfoEntity(dob: dob));
 
         // Act
         viewModel.resetParameters();
 
         // Assert
-        expect(viewModel.age, greaterThanOrEqualTo(23));
-        expect(viewModel.age, lessThanOrEqualTo(25));
+        expect(viewModel.age, 25);
       });
 
       test('should handle birthday calculation correctly', () {
@@ -378,7 +370,11 @@ void main() {
         final enlistmentDate = now.subtract(const Duration(days: 365));
         final ordDate = now.add(const Duration(days: 365));
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: enlistmentDate, ordDate: ordDate),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: enlistmentDate,
+            ordDate: ordDate,
+          ),
         );
 
         // Act
@@ -391,7 +387,11 @@ void main() {
       test('should handle missing service dates', () {
         // Arrange
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: null, ordDate: null),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: null,
+            ordDate: null,
+          ),
         );
 
         // Act

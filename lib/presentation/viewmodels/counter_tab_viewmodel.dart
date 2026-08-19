@@ -7,10 +7,10 @@ class CounterTabViewModel extends ChangeNotifier {
 
   CounterTabViewModel(this.userInfoUsecases);
 
-  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
+  UserInfoEntity? get _userInfoEntity => userInfoUsecases.userInfoEntity;
 
-  DateTime? get ordDate => _userInfoEntity.ordDate;
-  DateTime? get enlistmentDate => _userInfoEntity.enlistmentDate;
+  DateTime? get ordDate => _userInfoEntity?.ordDate;
+  DateTime? get enlistmentDate => _userInfoEntity?.enlistmentDate;
   DateTime get now => DateTime.now();
   DateTime get today => DateTime(now.year, now.month, now.day);
 

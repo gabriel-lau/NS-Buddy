@@ -15,14 +15,14 @@ class SettingsViewModel extends ChangeNotifier {
     required this.userInfoUsecases,
   });
 
-  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity;
+  UserInfoEntity get _userInfoEntity => userInfoUsecases.userInfoEntity!;
   SettingsEntity get _settingsEntity => settingsUsecases.settingsEntity;
 
   DateTime? get dob => _userInfoEntity.dob;
   Future<void> setDob(DateTime? value) async {
     await userInfoUsecases.updateUserInfo(
       UserInfoEntity(
-        dob: value,
+        dob: value!,
         gender: _userInfoEntity.gender,
         isShiongVoc: _userInfoEntity.isShiongVoc,
         ordDate: _userInfoEntity.ordDate,

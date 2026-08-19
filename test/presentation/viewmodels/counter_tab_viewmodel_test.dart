@@ -5,10 +5,10 @@ import 'package:ns_buddy/presentation/viewmodels/counter_tab_viewmodel.dart';
 
 // Fake implementation for testing
 class FakeUserInfoUsecases extends UserInfoUsecases {
-  UserInfoEntity _userInfoEntity = UserInfoEntity();
+  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: DateTime(2000, 1, 1));
 
   @override
-  UserInfoEntity get userInfoEntity => _userInfoEntity;
+  UserInfoEntity? get userInfoEntity => _userInfoEntity;
 
   void setUserInfo(UserInfoEntity userInfo) {
     _userInfoEntity = userInfo;
@@ -26,7 +26,7 @@ class FakeUserInfoUsecases extends UserInfoUsecases {
 
   @override
   Future<void> resetUserInfo() async {
-    _userInfoEntity = UserInfoEntity();
+    _userInfoEntity = null;
   }
 }
 
@@ -43,7 +43,9 @@ void main() {
     group('ordDate', () {
       test('should return null when user has no ORD date', () {
         // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(ordDate: null));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), ordDate: null),
+        );
 
         // Act
         final result = viewModel.ordDate;
@@ -55,7 +57,9 @@ void main() {
       test('should return ORD date when user has ORD date', () {
         // Arrange
         final ordDate = DateTime(2025, 12, 31);
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(ordDate: ordDate));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), ordDate: ordDate),
+        );
 
         // Act
         final result = viewModel.ordDate;
@@ -68,7 +72,9 @@ void main() {
     group('enlistmentDate', () {
       test('should return null when user has no enlistment date', () {
         // Arrange
-        fakeUserInfoUsecases.setUserInfo(UserInfoEntity(enlistmentDate: null));
+        fakeUserInfoUsecases.setUserInfo(
+          UserInfoEntity(dob: DateTime(2000, 1, 1), enlistmentDate: null),
+        );
 
         // Act
         final result = viewModel.enlistmentDate;
@@ -81,7 +87,10 @@ void main() {
         // Arrange
         final enlistmentDate = DateTime(2023, 1, 15);
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: enlistmentDate),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: enlistmentDate,
+          ),
         );
 
         // Act
@@ -98,7 +107,11 @@ void main() {
         final enlistmentDate = DateTime(2023, 1, 1);
         final ordDate = DateTime(2025, 1, 1);
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: enlistmentDate, ordDate: ordDate),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: enlistmentDate,
+            ordDate: ordDate,
+          ),
         );
 
         // Act
@@ -111,7 +124,11 @@ void main() {
       test('should return null for total days when dates are missing', () {
         // Arrange
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: DateTime(2023, 1, 1), ordDate: null),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: DateTime(2023, 1, 1),
+            ordDate: null,
+          ),
         );
 
         // Act
@@ -126,7 +143,11 @@ void main() {
         final enlistmentDate = DateTime(2023, 1, 1);
         final ordDate = DateTime(2025, 1, 1);
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: enlistmentDate, ordDate: ordDate),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: enlistmentDate,
+            ordDate: ordDate,
+          ),
         );
 
         // Act
@@ -142,7 +163,11 @@ void main() {
         final tomorrow = DateTime.now().add(const Duration(days: 1));
         final dayAfterTomorrow = DateTime.now().add(const Duration(days: 2));
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: tomorrow, ordDate: dayAfterTomorrow),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: tomorrow,
+            ordDate: dayAfterTomorrow,
+          ),
         );
 
         // Act
@@ -157,7 +182,11 @@ void main() {
         final enlistmentDate = DateTime(2023, 1, 1);
         final ordDate = DateTime(2023, 1, 11); // 10 days total
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: enlistmentDate, ordDate: ordDate),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: enlistmentDate,
+            ordDate: ordDate,
+          ),
         );
 
         // Act
@@ -172,7 +201,11 @@ void main() {
       test('should return null for percent elapsed when dates are missing', () {
         // Arrange
         fakeUserInfoUsecases.setUserInfo(
-          UserInfoEntity(enlistmentDate: null, ordDate: DateTime(2025, 1, 1)),
+          UserInfoEntity(
+            dob: DateTime(2000, 1, 1),
+            enlistmentDate: null,
+            ordDate: DateTime(2025, 1, 1),
+          ),
         );
 
         // Act

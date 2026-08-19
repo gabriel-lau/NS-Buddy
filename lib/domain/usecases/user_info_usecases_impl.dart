@@ -7,14 +7,15 @@ class UserInfoUsecasesImpl extends ChangeNotifier implements UserInfoUsecases {
   final UserInfoRepository repository;
 
   UserInfoUsecasesImpl(this.repository);
-  late UserInfoEntity _currentUserInfo;
+  late UserInfoEntity? _currentUserInfo;
 
   @override
-  UserInfoEntity get userInfoEntity => _currentUserInfo;
+  UserInfoEntity? get userInfoEntity => _currentUserInfo;
 
   @override
   Future<void> retrieveUserInfo() async {
     _currentUserInfo = await repository.retrieveUserInfo();
+    // notifyListeners();
   }
 
   @override
@@ -26,7 +27,7 @@ class UserInfoUsecasesImpl extends ChangeNotifier implements UserInfoUsecases {
 
   @override
   Future<void> resetUserInfo() async {
-    _currentUserInfo = UserInfoEntity(); // Reset to default values
+    _currentUserInfo = null; // Reset to default values
     notifyListeners();
     await repository.resetUserInfo();
   }

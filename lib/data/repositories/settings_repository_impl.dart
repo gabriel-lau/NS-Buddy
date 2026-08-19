@@ -10,16 +10,31 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<SettingsEntity> retrieveSettings() async {
-    return await _localDataSource.loadSettings();
+    try {
+      return await _localDataSource.loadSettings();
+    } catch (e) {
+      await _localDataSource.saveSettings(
+        SettingsModel(),
+      ); // Save default settings
+      return SettingsModel(); // Return default settings
+    }
   }
 
   @override
   Future<void> updateSettings(SettingsEntity settings) async {
-    await _localDataSource.saveSettings(SettingsModel.fromEntity(settings));
+    try {
+      await _localDataSource.saveSettings(SettingsModel.fromEntity(settings));
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
   Future<void> resetSettings() async {
-    await _localDataSource.resetSettings();
+    try {
+      await _localDataSource.resetSettings();
+    } catch (e) {
+      rethrow;
+    }
   }
 }

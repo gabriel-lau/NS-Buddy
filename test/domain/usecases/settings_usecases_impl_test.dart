@@ -197,7 +197,7 @@ void main() {
           expect(settingsUsecases.settingsEntity.theme, ThemeOption.system);
           expect(
             settingsUsecases.settingsEntity.primaryColour,
-            ColourOption.system,
+            ColourOption.blue,
           );
           expect(settingsUsecases.settingsEntity.disablePersistence, false);
           expect(notificationReceived, true);

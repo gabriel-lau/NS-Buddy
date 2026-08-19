@@ -3,15 +3,7 @@ import 'package:ns_buddy/enums/colour_option.dart';
 import 'package:ns_buddy/enums/theme_option.dart';
 
 class SettingsModel extends SettingsEntity {
-  SettingsModel({
-    required ThemeOption theme,
-    required ColourOption primaryColour,
-    required bool disablePersistence,
-  }) : super(
-         theme: theme,
-         primaryColour: primaryColour,
-         disablePersistence: disablePersistence,
-       );
+  SettingsModel({super.theme, super.primaryColour, super.disablePersistence});
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) {
     return SettingsModel(
