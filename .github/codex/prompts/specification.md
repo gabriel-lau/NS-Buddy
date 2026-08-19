@@ -52,9 +52,15 @@ List only decisions that materially affect the result. Write `None` when the Iss
 
 ## Readiness
 
-Return exactly one status and a one-sentence reason:
+Return exactly one status and a one-sentence reason using these two lines as the first content under this heading:
 
-- `READY_FOR_HUMAN_APPROVAL`
-- `NEEDS_CLARIFICATION`
+`Status: <STATUS>`
+
+`Reason: <one sentence>`
+
+- Use `READY_FOR_HUMAN_APPROVAL` when the Issue is sufficiently precise for HUMAN review and approval.
+- Use `NEEDS_CLARIFICATION` whenever a material decision remains unresolved.
+- Replace `<STATUS>` with exactly one of those two values, without backticks.
+- Do not use `Status:` anywhere else in the response.
 
 Do not state or imply that you approved the Issue.

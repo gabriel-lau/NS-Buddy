@@ -80,6 +80,39 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
+            const specification = process.env.CODEX_SPECIFICATION ?? '';
+            const readinessSection = specification.match(
+              /(?:^|\r?\n)## Readiness\s*\r?\n([\s\S]*?)(?=\r?\n## |\s*$)/,
+            );
+
+            if (!readinessSection) {
+              throw new Error('Codex response is missing the required ## Readiness section.');
+            }
+
+            const statusMatches = [
+              ...readinessSection[1].matchAll(
+                /^Status:\s*(READY_FOR_HUMAN_APPROVAL|NEEDS_CLARIFICATION)\s*$/gm,
+              ),
+            ];
+
+            if (statusMatches.length !== 1) {
+              throw new Error(
+                'Codex response must contain exactly one valid Status line under ## Readiness.',
+              );
+            }
+
+            const status = statusMatches[0][1];
+            const statusLabel = {
+              READY_FOR_HUMAN_APPROVAL: 'pending-approval',
+              NEEDS_CLARIFICATION: 'needs-clarification',
+            }[status];
+            const otherStatusLabel = statusLabel === 'pending-approval'
+              ? 'needs-clarification'
+              : 'pending-approval';
+            const currentLabels = (context.payload.issue.labels ?? []).map((label) =>
+              typeof label === 'string' ? label : label.name
+            );
+
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const body = [
               '<!-- codex-specification-analysis -->',
@@ -102,12 +135,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              labels: ['needs-human'],
+              labels: ['needs-human', statusLabel],
             });
 
-            await github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: 'needs-spec',
-            });
+            for (const label of ['needs-spec', otherStatusLabel]) {
+              if (currentLabels.includes(label)) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  name: label,
+                });
+              }
+            }
