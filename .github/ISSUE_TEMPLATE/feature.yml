@@ -37,14 +37,6 @@ body:
       required: true
 
   - type: textarea
-    id: non_goals
-    attributes:
-      label: Non-goals
-      description: Explicitly state adjacent work that is outside this request.
-    validations:
-      required: true
-
-  - type: textarea
     id: constraints
     attributes:
       label: Constraints and compatibility
