@@ -1,0 +1,79 @@
+name: Bug report
+description: Report reproducible incorrect behavior
+title: "[Bug]: "
+labels:
+  - needs-spec
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe observed behavior and evidence. Do not include credentials, private data, or secrets.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened, and how does it affect the user?
+      placeholder: Describe the incorrect behavior and its impact.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest reliable sequence that reproduces the problem.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: Include exact messages, values, screenshots, or recordings where useful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior, not an implementation approach.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Proposed acceptance criteria
+      description: List testable outcomes. The specification agent may refine them.
+      placeholder: |
+        - [ ] Given ..., when ..., then ...
+        - [ ] Existing ... behavior remains unchanged.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Device, OS, app version or commit, and any relevant settings.
+      placeholder: Android 14, app 1.0.0, dark theme
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals and constraints
+      description: State behavior that should not change and relevant compatibility constraints.
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Add logs, screenshots, recordings, or links after removing sensitive information.

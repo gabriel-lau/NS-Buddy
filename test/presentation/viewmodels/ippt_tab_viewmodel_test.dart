@@ -3,9 +3,14 @@ import 'package:ns_buddy/domain/entities/user_info_entity.dart';
 import 'package:ns_buddy/domain/interfaces/user_info_usecases.dart';
 import 'package:ns_buddy/presentation/viewmodels/ippt_tab_viewmodel.dart';
 
+DateTime _dobForAge(int age) {
+  final now = DateTime.now();
+  return DateTime(now.year - age, now.month, now.day);
+}
+
 // Fake implementation for testing
 class FakeUserInfoUsecases extends UserInfoUsecases {
-  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: DateTime(2000, 1, 1));
+  UserInfoEntity? _userInfoEntity = UserInfoEntity(dob: _dobForAge(25));
 
   @override
   UserInfoEntity? get userInfoEntity => _userInfoEntity;
@@ -310,15 +315,14 @@ void main() {
     group('date of birth age derivation', () {
       test('should derive age correctly from DOB', () {
         // Arrange
-        final dob = DateTime(2000, 1, 1); // Should be ~24-25 years old
+        final dob = _dobForAge(25);
         fakeUserInfoUsecases.setUserInfo(UserInfoEntity(dob: dob));
 
         // Act
         viewModel.resetParameters();
 
         // Assert
-        expect(viewModel.age, greaterThanOrEqualTo(23));
-        expect(viewModel.age, lessThanOrEqualTo(25));
+        expect(viewModel.age, 25);
       });
 
       test('should handle birthday calculation correctly', () {
